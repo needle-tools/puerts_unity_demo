@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using DefaultNamespace;
 using Puerts;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.LowLevel;
-using Random = UnityEngine.Random;
+using UnityEditor;
 
 namespace Needle.Puerts
 {
@@ -103,8 +100,10 @@ namespace Needle.Puerts
 			// 	wasFocused = focused;
 			// 	ReloadAllComponents();
 			// }
+			#if UNITY_EDITOR
 			if (Time.frameCount % 10 == 0)
 				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+			#endif
 
 			Env.Tick();
 		}

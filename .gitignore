@@ -12,3 +12,4 @@ UserSettings
 node_modules
 obj
 projects/**/Gen/Typing/csharp/*.ts
+projects/*/builds
