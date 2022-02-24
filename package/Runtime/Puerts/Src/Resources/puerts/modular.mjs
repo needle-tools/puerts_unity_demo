@@ -11,6 +11,7 @@ let moduleCache = Object.create(null); // key to sid
 let tmpModuleStorage = []; // sid to module
 
 function addModule(m) {
+    console.log("add module", m);
     for (var i = 0; i < tmpModuleStorage.length; i++) {
         if (!tmpModuleStorage[i]) {
             tmpModuleStorage[i] = m;
@@ -26,6 +27,7 @@ function getModuleBySID(id) {
 
 let buildinModule = Object.create(null);
 function executeModule(fullPath, script, debugPath, sid) {
+    console.log(fullPath)
     sid = (typeof sid == 'undefined') ? 0 : sid;
     let fullPathInJs = fullPath.replace(/\\/g, '\\\\');
     let fullDirInJs = (fullPath.indexOf('/') != -1) ? fullPath.substring(0, fullPath.lastIndexOf("/")) : fullPath.substring(0, fullPath.lastIndexOf("\\")).replace(/\\/g, '\\\\');
@@ -45,6 +47,7 @@ function executeModule(fullPath, script, debugPath, sid) {
 function genRequire(requiringDir) {
     let localModuleCache = Object.create(null);
     function require(moduleName) {
+        console.log(requiringDir, moduleName);
         moduleName = moduleName.startsWith('./') ? moduleName.substr(2) : moduleName;
         if (moduleName in localModuleCache) return localModuleCache[moduleName].exports;
         if (moduleName in buildinModule) return buildinModule[moduleName];
@@ -100,6 +103,7 @@ function genRequire(requiringDir) {
 }
 
 function registerBuildinModule(name, module) {
+    console.log("register builtin", name);
     buildinModule[name] = module;
 }
 

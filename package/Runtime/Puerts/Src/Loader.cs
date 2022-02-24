@@ -30,7 +30,7 @@ namespace Puerts
 
         public DefaultLoader(string root)
         {
-            this.root = root;
+            this.root = Path.GetFullPath(root);
         }
 
         private string PathToUse(string filepath)

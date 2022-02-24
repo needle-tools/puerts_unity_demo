@@ -58,6 +58,7 @@ function searchModuleInDir(dir, requiredModule) {
 }
 
 function searchModule(dir, requiredModule) {
+    console.log("Search " + dir, requiredModule);
     var result = searchModuleInDir(dir, requiredModule);
     if (result) return result;
     if (dir != "" && !requiredModule.endsWith(".js")) {
