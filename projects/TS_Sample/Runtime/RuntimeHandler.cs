@@ -1,7 +1,12 @@
-﻿using Puerts;
+﻿using System;
+using DefaultNamespace;
+using Puerts;
 using UnityEngine;
+using UnityEngine.LowLevel;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
-namespace DefaultNamespace
+namespace Needle.Puerts
 {
 	[ExecuteInEditMode]
 	public class RuntimeHandler : MonoBehaviour
@@ -40,6 +45,38 @@ namespace DefaultNamespace
 		public static void Reload(string name)
 		{
 			Env.ClearModuleCache();
+		}
+
+		public static JSObject CreateInstance(BindableComponent inst, string name)
+		{
+			Debug.Log("Create instance for " + name, inst as Object);
+			var varName = $"{name}_{Time.frameCount}_{Random.Range(0, 100000)}";
+			const string jsInst = "inst";
+			const string csInst = "bind";
+
+			PlayerLoopSystem.UpdateFunction cb = () => inst?.updateCallback?.Invoke();
+			PlayerLoopHelper.AddUpdateCallback(inst, cb, PlayerLoopEvent.Update);
+
+			var functionBindings = "";
+			// if (update != null)
+			// {
+				functionBindings += $"if({jsInst}.update !== undefined) {csInst}.{nameof(BindableComponent.updateCallback)} = () => {{ {jsInst}.update(); }};\n";
+			// }
+			Debug.Log(functionBindings);
+
+			var create = Env.Eval<Func<object, JSObject>>(
+				$@"
+const {varName} = require('{name}'); 
+function create({csInst}){{
+const {jsInst} = new {varName}.{name}({csInst});
+{functionBindings}
+return {jsInst};
+}}; 
+create
+"
+			);
+			var jsInstance = create(inst);
+			return jsInstance;
 		}
 
 		private void Update()
