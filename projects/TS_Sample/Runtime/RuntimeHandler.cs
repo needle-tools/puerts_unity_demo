@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using DefaultNamespace;
 using Puerts;
 using UnityEngine;
@@ -47,29 +48,24 @@ namespace Needle.Puerts
 			Env.ClearModuleCache();
 		}
 
+		const string jsInst = "inst";
+		const string csInst = "bind";
+		
 		public static JSObject CreateInstance(BindableComponent inst, string name)
 		{
-			Debug.Log("Create instance for " + name, inst as Object);
+			Debug.Log("Create instance for " + name, inst);
 			var varName = $"{name}_{Time.frameCount}_{Random.Range(0, 100000)}";
-			const string jsInst = "inst";
-			const string csInst = "bind";
 
-			PlayerLoopSystem.UpdateFunction cb = () => inst?.updateCallback?.Invoke();
-			PlayerLoopHelper.AddUpdateCallback(inst, cb, PlayerLoopEvent.Update);
+			var eventBindings = CreateEventBindings(inst);
 
-			var functionBindings = "";
-			// if (update != null)
-			// {
-				functionBindings += $"if({jsInst}.update !== undefined) {csInst}.{nameof(BindableComponent.updateCallback)} = () => {{ {jsInst}.update(); }};\n";
-			// }
-			Debug.Log(functionBindings);
+			Debug.Log(eventBindings);
 
 			var create = Env.Eval<Func<object, JSObject>>(
 				$@"
 const {varName} = require('{name}'); 
 function create({csInst}){{
 const {jsInst} = new {varName}.{name}({csInst});
-{functionBindings}
+{eventBindings}
 return {jsInst};
 }}; 
 create
@@ -77,6 +73,22 @@ create
 			);
 			var jsInstance = create(inst);
 			return jsInstance;
+		}
+
+		private static string CreateEventBindings(BindableComponent obj)
+		{
+			var functionBindings = "";
+			var type = obj.GetType();
+			if (type.GetMethod("Update", BindingFlags.Default | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
+			{
+				functionBindings += $"if({jsInst}.update !== undefined) {csInst}.{nameof(BindableComponent.updateCallback)} = () => {{ {jsInst}.update(); }};\n";
+				PlayerLoopSystem.UpdateFunction cb = null;
+				cb = () => { if (obj) obj.updateCallback?.Invoke(); else PlayerLoopHelper.RemoveUpdateDelegate(obj, cb); };
+				PlayerLoopHelper.AddUpdateCallback(obj, cb, PlayerLoopEvent.Update);
+			}
+			// Enum.TryParse("Update", out PlayerLoopEvent en);
+
+			return functionBindings;
 		}
 
 		private void Update()
