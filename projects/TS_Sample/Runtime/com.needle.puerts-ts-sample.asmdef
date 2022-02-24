@@ -1,0 +1,16 @@
+{
+    "name": "com.needle.puerts-ts-sample",
+    "rootNamespace": "",
+    "references": [
+        "GUID:79f1e92bfe64d8c43bfc54a75c8f3c1a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
