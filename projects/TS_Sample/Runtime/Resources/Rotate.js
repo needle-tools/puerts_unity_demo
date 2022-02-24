@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Rotate = void 0;
-const speed = 2;
+const speed = 30;
 const csharp_1 = require("csharp");
 class Rotate {
     bindTo;
@@ -15,13 +15,25 @@ class Rotate {
         // this.bindTo.JsOnDestroy = () => this.onDestroy();
         // bindTo.StartCoroutine(bindTo.Coroutine());
     }
+    awake() {
+        console.log("AWAKE");
+    }
+    onEnable() {
+        console.log("ENABLED");
+    }
+    onDisable() {
+        console.log("DISABLE");
+    }
+    start() {
+        console.log("START");
+    }
     update() {
-        console.log("UPDATE js");
-        let r = csharp_1.default.UnityEngine.Vector3.op_Multiply(csharp_1.default.UnityEngine.Vector3.up, csharp_1.default.UnityEngine.Time.deltaTime * speed * 100);
+        // console.log("UPDATE js");
+        let r = csharp_1.default.UnityEngine.Vector3.op_Multiply(csharp_1.default.UnityEngine.Vector3.up, csharp_1.default.UnityEngine.Time.deltaTime * speed);
         this.bindTo.transform.Rotate(r);
     }
     onDestroy() {
-        console.log('onDestroy...');
+        console.log('onDestroy');
     }
 }
 exports.Rotate = Rotate;
