@@ -3,7 +3,7 @@
     "rootNamespace": "Needle.Puerts",
     "references": [
         "com.needle.puerts-ts-sample",
-        "com.tencent.puerts.Editor"
+        "com.tencent.puerts"
     ],
     "includePlatforms": [
         "Editor"

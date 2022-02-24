@@ -23,34 +23,40 @@ namespace Needle.Puerts
 		private JSObject jsInstance;
 
 		public Action awake, onEnable, onDisable, start, earlyUpdate, update, lateUpdate, onDestroy;
+		public Action onValidate;
 
 		internal void Register()
 		{
 			this.jsInstance = RuntimeHandler.RegisterInstance(this);
 		}
 
-		private void Awake()
+		protected virtual void OnValidate()
+		{
+			onValidate?.Invoke();
+		}
+
+		protected virtual void Awake()
 		{
 			Register();
 			awake?.Invoke();
 		}
 
-		private void OnEnable()
+		protected virtual void OnEnable()
 		{
 			onEnable?.Invoke();
 		}
 
-		private void OnDisable()
+		protected virtual void OnDisable()
 		{
 			onDisable?.Invoke();
 		}
 
-		private void Start()
+		protected virtual void Start()
 		{
 			start?.Invoke();
 		}
 
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			onDestroy?.Invoke();
 		}

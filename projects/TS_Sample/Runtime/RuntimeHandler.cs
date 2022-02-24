@@ -87,6 +87,7 @@ namespace Needle.Puerts
 			AddBinding(nameof(BindableComponent.update));
 			AddBinding(nameof(BindableComponent.lateUpdate));
 			AddBinding(nameof(BindableComponent.onDestroy));
+			AddBinding(nameof(BindableComponent.onValidate));
 
 			void AddBinding(string fn) => functionBindings += $"if({jsInst}.{fn} !== undefined) {csInst}.{fn} = () => {{ {jsInst}.{fn}(); }};\n";
 			return functionBindings;
@@ -119,7 +120,7 @@ namespace Needle.Puerts
 		private void OnUpdate() => InvokeEvents(PlayerLoopEvent.Update, components);
 		private void OnLateUpdate() => InvokeEvents(PlayerLoopEvent.PostLateUpdate, components);
 
-		private void InvokeEvents(PlayerLoopEvent evt, List<RegisteredComponent> list)
+		private void InvokeEvents(PlayerLoopEvent evt, List<RegisteredComponent> list, bool requireActive = true)
 		{
 			for (var index = 0; index < list.Count; index++)
 			{
@@ -129,6 +130,7 @@ namespace Needle.Puerts
 					list.RemoveAt(index--);
 					continue;
 				}
+				if (!reg.Component.isActiveAndEnabled) continue;
 				switch (evt)
 				{
 					case PlayerLoopEvent.EarlyUpdate:
