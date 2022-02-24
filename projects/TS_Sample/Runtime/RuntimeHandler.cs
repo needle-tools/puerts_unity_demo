@@ -50,50 +50,33 @@ namespace Needle.Puerts
 		private static RuntimeHandler _instance;
 
 
-		private const string jsInst = "inst";
-		private const string csInst = "bind";
 		private readonly List<RegisteredComponent> components = new List<RegisteredComponent>();
 
 		public static void ReloadAllComponents()
 		{
 			Debug.Log("RELOAD ALL components");
-			var copy = Instance.components.ToArray();
-			Instance.components.Clear();
 			Env.ClearModuleCache();
-			foreach (var e in copy)
+			foreach (var e in Instance.components)
 			{
-				if (e.Component)
-					e.Component.Register();
+				e.Recreate();
 			}
 		}
+
+		public static void ReloadComponents(string name)
+		{
+		}
+
+		internal static int CurrentId;
 
 		public static JSObject RegisterInstance(BindableComponent inst)
 		{
 			var name = inst.moduleName;
-			var varName = $"{name}_{Time.frameCount}_{Random.Range(0, 100000)}";
-
-			var eventBindings = CreateEventBindings();
-			Debug.Log("Create instance for " + name + "\n" + eventBindings, inst);
-
-			var create = Env.Eval<Func<object, JSObject>>(
-				$@"
-const {varName} = require('{name}'); 
-function create({csInst}){{
-const {jsInst} = new {varName}.{name}({csInst});
-{eventBindings}
-return {jsInst};
-}}; 
-create
-", varName
-			);
-			var jsInstance = create(inst);
-
-			Instance.components.Add(new RegisteredComponent() { Component = inst, JsInstance = jsInstance });
-
-			return jsInstance;
+			var reg = new RegisteredComponent(name, inst);
+			Instance.components.Add(reg);
+			return reg.JsInstance;
 		}
 
-		private static string CreateEventBindings()
+		public static string CreateEventBindings(string jsInst, string csInst)
 		{
 			var functionBindings = "";
 			AddBinding(nameof(BindableComponent.awake));
@@ -109,7 +92,7 @@ create
 			return functionBindings;
 		}
 
-		private bool wasFocused = false;
+		// private bool wasFocused = false;
 
 		private void Update()
 		{
@@ -166,7 +149,56 @@ create
 	public class RegisteredComponent
 	{
 		public bool Exists => Component;
-		public BindableComponent Component;
-		public JSObject JsInstance;
+		public bool IsValid => Component && JsInstance != null;
+		public readonly string Name;
+		public readonly BindableComponent Component;
+		public JSObject JsInstance { get; private set; }
+
+		public RegisteredComponent(string name, BindableComponent component)
+		{
+			Name = name;
+			Component = component;
+			Recreate();
+		}
+
+		private const string jsInst = "inst";
+		private const string csInst = "bind";
+
+		public void Recreate()
+		{
+			var env = RuntimeHandler.Env;
+			var isRecompile = JsInstance != null;
+
+			var inst = Component;
+			var name = Name;
+			var varName = $"{name}_{inst.GetInstanceID()}_{RuntimeHandler.CurrentId++}";
+
+			var eventBindings = RuntimeHandler.CreateEventBindings(jsInst, csInst);
+
+			var chunk = $@"
+const {varName} = require('{name}'); 
+function create({csInst}){{
+	const {jsInst} = new {varName}.{name}();
+	{jsInst}.unity = {csInst};
+	{eventBindings}
+	return {jsInst};
+}}; 
+create
+";
+
+			Debug.Log("Create instance for " + name + ":\n" + chunk, inst);
+			var create = env.Eval<Func<object, JSObject>>(chunk, varName);
+			this.JsInstance = create(inst);
+
+			if (isRecompile && this.JsInstance != null)
+			{
+				this.Component.awake?.Invoke();
+				if (this.Component.enabled)
+				{
+					this.Component.onEnable?.Invoke();
+					this.Component.start?.Invoke();
+				}
+			}
+		}
 	}
 }
