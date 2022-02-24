@@ -2,7 +2,7 @@
 
 export class Behaviour {
 
-    unity: CS.MonoBehaviour;
+    unity: CS.UnityEngine.MonoBehaviour;
 
     awake() {
         console.log("AWAKE1");
@@ -24,7 +24,7 @@ export class Behaviour {
 export class Rotate extends Behaviour {
 
     update() {
-        if(!this.unity) return;
+        if (!this.unity) return;
         const speed = 30;
         const r = CS.UnityEngine.Vector3.op_Multiply(CS.UnityEngine.Vector3.up, CS.UnityEngine.Time.deltaTime * speed);
         this.unity.transform.Rotate(r);

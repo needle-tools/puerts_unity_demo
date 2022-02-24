@@ -2,7 +2,8 @@
     "name": "com.needle.puerts-ts-sample.Editor",
     "rootNamespace": "Needle.Puerts",
     "references": [
-        "com.needle.puerts-ts-sample"
+        "com.needle.puerts-ts-sample",
+        "com.tencent.puerts.Editor"
     ],
     "includePlatforms": [
         "Editor"

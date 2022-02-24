@@ -2,6 +2,15 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path" : "../../../package/Runtime/Puerts/Typing"
+		},
+		{
+			"path" : "../../../package/Runtime/Gen/Typing"
+		},
+		{
+			"path" : "../../Puerts_2020_3/Assets/Gen/Typing"
 		}
 	],
 	"settings": {
