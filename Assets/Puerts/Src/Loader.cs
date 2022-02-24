@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Mime;
 /*
 * Tencent is pleased to support the open source community by making Puerts available.
@@ -21,6 +22,7 @@ namespace Puerts
     public class DefaultLoader : ILoader
     {
         private string root = "";
+        public bool isExternal = false;
 
         public DefaultLoader()
         {
@@ -44,9 +46,9 @@ namespace Puerts
 
         public bool FileExists(string filepath)
         {
-#if PUERTS_GENERAL
-            return File.Exists(Path.Combine(root, filepath));
-#else 
+// #if PUERTS_GENERAL
+			if(isExternal && File.Exists(Path.Combine(root, filepath))) return true;
+// #else 
             string pathToUse = this.PathToUse(filepath);
             bool exist = UnityEngine.Resources.Load(pathToUse) != null;
 #if !PUERTS_GENERAL && UNITY_EDITOR && !UNITY_2018_1_OR_NEWER
@@ -56,15 +58,18 @@ namespace Puerts
             }
 #endif
             return exist;
-#endif
+// #endif
         }
 
         public string ReadFile(string filepath, out string debugpath)
         {
-#if PUERTS_GENERAL
-            debugpath = Path.Combine(root, filepath);
-            return File.ReadAllText(debugpath);
-#else 
+// #if PUERTS_GENERAL
+	        if (isExternal && File.Exists(Path.Combine(root, filepath)))
+	        {
+	            debugpath = Path.Combine(root, filepath);
+	            return File.ReadAllText(debugpath);
+	        }
+// #else 
             string pathToUse = this.PathToUse(filepath);
             UnityEngine.TextAsset file = (UnityEngine.TextAsset)UnityEngine.Resources.Load(pathToUse);
             
@@ -73,7 +78,7 @@ namespace Puerts
             debugpath = debugpath.Replace("/", "\\");
 #endif
             return file == null ? null : file.text;
-#endif
+// #endif
         }
     }
 }

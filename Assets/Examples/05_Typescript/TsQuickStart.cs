@@ -10,12 +10,18 @@ namespace PuertsTest
     {
         JsEnv jsEnv;
 
-        void Start()
+        private void OnApplicationFocus(bool hasFocus)
         {
-            jsEnv = new JsEnv();
-            //jsEnv = new JsEnv(new DefaultLoader(UnityEngine.Application.dataPath + "../TsProj/output/"), 8080);
-            //jsEnv.WaitDebugger();
-            jsEnv.Eval("require('QuickStart')");
+            if (hasFocus)
+            {
+                if(jsEnv != null) jsEnv.Dispose();
+                Debug.Log("RECREATE MODULE");
+                jsEnv = new JsEnv(new DefaultLoader(@"C:\git\puerts_unity_demo\TsProj\output"){isExternal = true});
+                // jsEnv = new JsEnv(new DefaultLoader(UnityEngine.Application.dataPath + "../TsProj/output/"), 8080);
+                // jsEnv.WaitDebugger();
+                jsEnv.ClearModuleCache();
+                jsEnv.Eval("require('MyComponent')", Time.frameCount.ToString());
+            }
         }
 
         private void Update()
