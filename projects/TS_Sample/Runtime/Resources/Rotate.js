@@ -5,21 +5,15 @@ const speed = 30;
 const csharp_1 = require("csharp");
 class Rotate {
     bindTo;
-    // constructor(){
-    //     console.log('HELLO');
-    // }
     constructor(bindTo) {
         console.log('HELLO BINDING');
         this.bindTo = bindTo;
-        // this.bindTo.JsUpdate = () => this.onUpdate();
-        // this.bindTo.JsOnDestroy = () => this.onDestroy();
-        // bindTo.StartCoroutine(bindTo.Coroutine());
     }
     awake() {
         console.log("AWAKE");
     }
     onEnable() {
-        console.log("ENABLED");
+        console.log("ENABLED HELLO!!!!");
     }
     onDisable() {
         console.log("DISABLE");
@@ -28,8 +22,7 @@ class Rotate {
         console.log("START");
     }
     update() {
-        // console.log("UPDATE js");
-        let r = csharp_1.default.UnityEngine.Vector3.op_Multiply(csharp_1.default.UnityEngine.Vector3.up, csharp_1.default.UnityEngine.Time.deltaTime * speed);
+        let r = csharp_1.default.UnityEngine.Vector3.op_Multiply(csharp_1.default.UnityEngine.Vector3.up, csharp_1.default.UnityEngine.Time.deltaTime * speed * 1);
         this.bindTo.transform.Rotate(r);
     }
     onDestroy() {
@@ -37,7 +30,4 @@ class Rotate {
     }
 }
 exports.Rotate = Rotate;
-// export function init(bindTo : CS.MonoBehaviour) {
-//     new Rotate(bindTo);
-// }
 //# sourceMappingURL=Rotate.js.map

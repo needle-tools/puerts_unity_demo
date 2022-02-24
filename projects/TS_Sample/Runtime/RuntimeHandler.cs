@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using DefaultNamespace;
 using Puerts;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using Random = UnityEngine.Random;
@@ -51,16 +52,28 @@ namespace Needle.Puerts
 
 		private const string jsInst = "inst";
 		private const string csInst = "bind";
-		private List<RegisteredComponent> components = new List<RegisteredComponent>();
+		private readonly List<RegisteredComponent> components = new List<RegisteredComponent>();
+
+		public static void ReloadAllComponents()
+		{
+			Debug.Log("RELOAD ALL components");
+			var copy = Instance.components.ToArray();
+			Instance.components.Clear();
+			Env.ClearModuleCache();
+			foreach (var e in copy)
+			{
+				if (e.Component)
+					e.Component.Register();
+			}
+		}
 
 		public static JSObject RegisterInstance(BindableComponent inst)
 		{
 			var name = inst.moduleName;
-			Debug.Log("Create instance for " + name, inst);
 			var varName = $"{name}_{Time.frameCount}_{Random.Range(0, 100000)}";
 
 			var eventBindings = CreateEventBindings();
-			Debug.Log(eventBindings);
+			Debug.Log("Create instance for " + name + "\n" + eventBindings, inst);
 
 			var create = Env.Eval<Func<object, JSObject>>(
 				$@"
@@ -71,7 +84,7 @@ const {jsInst} = new {varName}.{name}({csInst});
 return {jsInst};
 }}; 
 create
-"
+", varName
 			);
 			var jsInstance = create(inst);
 
@@ -96,8 +109,19 @@ create
 			return functionBindings;
 		}
 
+		private bool wasFocused = false;
+
 		private void Update()
 		{
+			// var focused = UnityEditorInternal.InternalEditorUtility.isApplicationActive;
+			// if (focused != wasFocused)
+			// {
+			// 	wasFocused = focused;
+			// 	ReloadAllComponents();
+			// }
+			if (Time.frameCount % 10 == 0)
+				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
 			Env.Tick();
 		}
 

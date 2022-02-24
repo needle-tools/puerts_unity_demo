@@ -24,9 +24,14 @@ namespace Needle.Puerts
 
 		public Action awake, onEnable, onDisable, start, earlyUpdate, update, lateUpdate, onDestroy;
 
-		private void Awake()
+		internal void Register()
 		{
 			this.jsInstance = RuntimeHandler.RegisterInstance(this);
+		}
+
+		private void Awake()
+		{
+			Register();
 			awake?.Invoke();
 		}
 
@@ -48,6 +53,12 @@ namespace Needle.Puerts
 		private void OnDestroy()
 		{
 			onDestroy?.Invoke();
+		}
+
+		[ContextMenu(nameof(Rebuild))]
+		private void Rebuild()
+		{
+			
 		}
 	}
 }

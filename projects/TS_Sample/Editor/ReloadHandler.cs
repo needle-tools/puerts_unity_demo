@@ -1,11 +1,14 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
+using Needle.Puerts;
+using UnityEditor;
 using Debug = UnityEngine.Debug;
 
 
 public static class ReloadHandler
 {
-	public static void CompileTypescript(string path)
+	public static async void CompileTypescript(string path)
 	{
 		var fullPath = Path.GetFullPath(path);
 		if (string.IsNullOrEmpty(fullPath) || !File.Exists(fullPath))
@@ -23,5 +26,12 @@ public static class ReloadHandler
 		var proc = new Process();
 		proc.StartInfo = pi;
 		proc.Start();
+		while (proc != null && !proc.HasExited)
+		{
+			await Task.Delay(100);
+		}
+		await Task.Delay(100);
+		AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+		RuntimeHandler.ReloadAllComponents();
 	}
 }
