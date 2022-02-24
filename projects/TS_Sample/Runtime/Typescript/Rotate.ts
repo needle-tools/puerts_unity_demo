@@ -6,25 +6,28 @@ export class Rotate {
     private bindTo: CS.MonoBehaviour;
 
     constructor(bindTo: CS.MonoBehaviour) {
-        console.log('HELLO BINDING');
         this.bindTo = bindTo;
     }
-    awake(){
-        console.log("AWAKE"); 
+    awake() {
+        console.log("AWAKE");
     }
-    onEnable(){
+    onEnable() {
         console.log("ENABLED HELLO!!!!");
     }
-    onDisable(){
+    onDisable() {
         console.log("DISABLE");
     }
-    start(){
+    start() {
         console.log("START");
     }
 
     update() {
-        let r = CS.UnityEngine.Vector3.op_Multiply(CS.UnityEngine.Vector3.up, CS.UnityEngine.Time.deltaTime * speed * 1);
+        let r = CS.UnityEngine.Vector3.op_Multiply(CS.UnityEngine.Vector3.up, CS.UnityEngine.Time.deltaTime * speed * 3);
         this.bindTo.transform.Rotate(r);
+
+        const pos = this.bindTo.transform.position;
+        pos.y += Math.sin(CS.UnityEngine.Time.time) * .003;
+        this.bindTo.transform.position = pos;
     }
 
     onDestroy() {
