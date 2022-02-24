@@ -1,7 +1,10 @@
 {
-    "name": "com.needle.puerts-ts-sample.Editor",
-    "references": ["com.needle.puerts-ts-sample","UnityEditor.UI","UnityEngine.UI","UnityEngine.TestRunner","UnityEditor.TestRunner"],
-    "includePlatforms": ["Editor"],
+    "name": "com.needle.puerts-ts-sample",
+    "rootNamespace": "Needle.Puerts",
+    "references": [
+        "GUID:79f1e92bfe64d8c43bfc54a75c8f3c1a"
+    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

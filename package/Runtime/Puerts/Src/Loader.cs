@@ -7,10 +7,6 @@ using System.Net.Mime;
 * This file is subject to the terms and conditions defined in file 'LICENSE', which is part of this source code package.
 */
 
-#if PUERTS_GENERAL || UNITY_EDITOR
-using System.IO;
-#endif
-
 namespace Puerts
 {
     public interface ILoader

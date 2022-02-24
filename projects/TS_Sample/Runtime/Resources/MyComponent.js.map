@@ -1,1 +1,1 @@
-{"version":3,"file":"MyComponent.js","sourceRoot":"","sources":["../MyComponent.ts"],"names":[],"mappings":";;AAGA,WAAW,CAAC,GAAE,EAAE;IACZ,OAAO,CAAC,GAAG,CAAC,WAAW,CAAC,CAAC;AAC7B,CAAC,EAAE,IAAI,CAAC,CAAC"}
+{"version":3,"file":"MyComponent.js","sourceRoot":"","sources":["../Typescript/MyComponent.ts"],"names":[],"mappings":";;AAGA,WAAW,CAAC,GAAE,EAAE;IACZ,OAAO,CAAC,GAAG,CAAC,WAAW,CAAC,CAAC;AAC7B,CAAC,EAAE,IAAI,CAAC,CAAC"}

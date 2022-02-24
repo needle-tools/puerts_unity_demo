@@ -1,10 +1,12 @@
 {
-    "name": "com.needle.puerts-ts-sample",
-    "rootNamespace": "",
+    "name": "com.needle.puerts-ts-sample.Editor",
+    "rootNamespace": "Needle.Puerts",
     "references": [
-        "GUID:79f1e92bfe64d8c43bfc54a75c8f3c1a"
+        "com.needle.puerts-ts-sample"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
