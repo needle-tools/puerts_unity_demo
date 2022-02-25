@@ -8,19 +8,26 @@ class Editor {
 exports.Editor = Editor;
 class RotateEditor extends Editor {
     onInspectorGUI() {
-        csharp_1.default.UnityEditor.EditorGUILayout.LabelField("JS Inspector", csharp_1.default.UnityEditor.EditorStyles.boldLabel);
+        csharp_1.default.UnityEditor.EditorGUILayout.LabelField("JS It Compiles", csharp_1.default.UnityEditor.EditorStyles.boldLabel);
         const target = this.unity?.target;
         if (target) {
-            // const sp = this.unity?.serializedObject?.FindProperty("speed");
-            // if (sp) {
-            //     CS.UnityEditor.EditorGUILayout.PropertyField(sp);
-            //     this.unity?.serializedObject?.ApplyModifiedProperties();
-            // }
-            // const col = this.unity?.serializedObject?.FindProperty("color");
-            // if (col) {
-            //     CS.UnityEditor.EditorGUILayout.PropertyField(col);
-            //     this.unity?.serializedObject?.ApplyModifiedProperties();
-            // }
+            const sp = this.unity?.serializedObject?.FindProperty("speed");
+            if (sp) {
+                csharp_1.default.UnityEditor.EditorGUILayout.PropertyField(sp);
+                this.unity?.serializedObject?.ApplyModifiedProperties();
+            }
+            const rc = this.unity?.serializedObject?.FindProperty("randomColor");
+            if (rc) {
+                csharp_1.default.UnityEditor.EditorGUILayout.PropertyField(rc);
+                this.unity?.serializedObject?.ApplyModifiedProperties();
+            }
+            if (!target.randomColor) {
+                const col = this.unity?.serializedObject?.FindProperty("color");
+                if (col) {
+                    csharp_1.default.UnityEditor.EditorGUILayout.PropertyField(col);
+                    this.unity?.serializedObject?.ApplyModifiedProperties();
+                }
+            }
         }
     }
 }

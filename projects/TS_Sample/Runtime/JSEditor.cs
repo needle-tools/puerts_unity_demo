@@ -5,8 +5,7 @@ namespace Needle.Puerts
 {
 	public abstract class JSEditor : Editor
 	{
-		[JSFunction]
-		public Action onEnable, onInspectorGUI;
+		[JSFunction] public Action onEnable, onInspectorGUI;
 
 		protected virtual void Awake()
 		{
@@ -20,8 +19,10 @@ namespace Needle.Puerts
 
 		public override void OnInspectorGUI()
 		{
-			base.OnInspectorGUI();
-			onInspectorGUI?.Invoke();
+			if (onInspectorGUI != null)
+				onInspectorGUI.Invoke();
+			else 
+				base.OnInspectorGUI();
 		}
 	}
 }
