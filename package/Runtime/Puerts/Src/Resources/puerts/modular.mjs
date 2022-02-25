@@ -11,7 +11,7 @@ let moduleCache = Object.create(null); // key to sid
 let tmpModuleStorage = []; // sid to module
 
 function addModule(m) {
-    console.log("add module", m);
+    // console.log("add module", m);
     for (var i = 0; i < tmpModuleStorage.length; i++) {
         if (!tmpModuleStorage[i]) {
             tmpModuleStorage[i] = m;
@@ -47,7 +47,7 @@ function executeModule(fullPath, script, debugPath, sid) {
 function genRequire(requiringDir) {
     let localModuleCache = Object.create(null);
     function require(moduleName) {
-        console.log(requiringDir, moduleName);
+        // console.log(requiringDir, moduleName);
         moduleName = moduleName.startsWith('./') ? moduleName.substr(2) : moduleName;
         if (moduleName in localModuleCache) return localModuleCache[moduleName].exports;
         if (moduleName in buildinModule) return buildinModule[moduleName];
@@ -103,7 +103,7 @@ function genRequire(requiringDir) {
 }
 
 function registerBuildinModule(name, module) {
-    console.log("register builtin", name);
+    // console.log("register builtin", name);
     buildinModule[name] = module;
 }
 

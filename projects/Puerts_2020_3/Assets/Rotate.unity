@@ -257,7 +257,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &678439680
 GameObject:
@@ -292,8 +292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 34.8
-  randomColor: 0
-  color: {r: 1, g: 0.79551554, b: 0.1462264, a: 0}
+  randomColor: 1
+  color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!65 &678439682
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -363,12 +363,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 678439680}
-  m_LocalRotation: {x: 0, y: 0.91596335, z: 0, w: -0.40126207}
-  m_LocalPosition: {x: 0, y: 0.7406859, z: 0}
+  m_LocalRotation: {x: 0, y: 0.95465046, z: 0, w: 0.29772875}
+  m_LocalPosition: {x: 0, y: 0.86987853, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &795582193
 GameObject:
@@ -487,7 +487,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 200
   randomColor: 0
-  color: {r: 1, g: 0.79551554, b: 0.1462264, a: 0}
+  color: {r: 1, g: 0, b: 0, a: 0}
 --- !u!65 &979549049
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -557,8 +557,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 979549047}
-  m_LocalRotation: {x: 0, y: 0.52085936, z: 0, w: -0.8536425}
-  m_LocalPosition: {x: -0.859, y: 0.7406859, z: 0.756}
+  m_LocalRotation: {x: 0, y: -0.000016578853, z: 0, w: 1}
+  m_LocalPosition: {x: -0.859, y: 0.86987853, z: 0.756}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
