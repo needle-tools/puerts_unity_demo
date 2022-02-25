@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using DefaultNamespace;
 using Puerts;
 using UnityEngine;
 using UnityEditor;
+using Object = UnityEngine.Object;
 
 namespace Needle.Puerts
 {
@@ -65,26 +69,47 @@ namespace Needle.Puerts
 
 		internal static int CurrentId;
 
-		public static JSObject RegisterInstance(BindableComponent inst)
+		public static JSObject RegisterEditor(JSEditor inst)
 		{
-			var name = inst.moduleName;
+			var name = inst.GetType().Name;
+			var reg = new RegisteredComponent(name, inst);
+			// Instance.components.Add(reg);
+			return reg.JsInstance;
+		}
+
+		public static JSObject RegisterComponent(IJSComponent inst)
+		{
+			var name = inst.GetType().Name;
 			var reg = new RegisteredComponent(name, inst);
 			Instance.components.Add(reg);
 			return reg.JsInstance;
 		}
 
-		public static string CreateEventBindings(string jsInst, string csInst)
+		private static readonly Dictionary<Type, IList<MemberInfo>> functionsCache = new Dictionary<Type, IList<MemberInfo>>();
+
+		public static string CreateEventBindings(object comp, string jsInst, string csInst, ref IList<MemberInfo> functions)
 		{
 			var functionBindings = "";
-			AddBinding(nameof(BindableComponent.awake));
-			AddBinding(nameof(BindableComponent.onEnable));
-			AddBinding(nameof(BindableComponent.onDisable));
-			AddBinding(nameof(BindableComponent.start));
-			AddBinding(nameof(BindableComponent.earlyUpdate));
-			AddBinding(nameof(BindableComponent.update));
-			AddBinding(nameof(BindableComponent.lateUpdate));
-			AddBinding(nameof(BindableComponent.onDestroy));
-			AddBinding(nameof(BindableComponent.onValidate));
+
+			if (functions == null)
+			{
+				var type = comp.GetType();
+				if (!functionsCache.TryGetValue(type, out functions))
+				{
+					functions = type.GetMembers(BindingFlags.Instance | BindingFlags.Public)
+						.Where(m => m.GetCustomAttribute(typeof(JSFunction)) != null)
+						.ToArray();
+					functionsCache.Add(type, functions);
+				}
+			}
+
+			if (functions != null)
+			{
+				foreach (var field in functions)
+				{
+					AddBinding(field.Name);
+				}
+			}
 
 			void AddBinding(string fn) => functionBindings += $"if({jsInst}.{fn} !== undefined) {csInst}.{fn} = () => {{ {jsInst}.{fn}(); }};\n";
 			return functionBindings;
@@ -100,10 +125,10 @@ namespace Needle.Puerts
 			// 	wasFocused = focused;
 			// 	ReloadAllComponents();
 			// }
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (Time.frameCount % 10 == 0)
 				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-			#endif
+#endif
 
 			Env.Tick();
 		}
@@ -119,7 +144,7 @@ namespace Needle.Puerts
 		private void OnUpdate() => InvokeEvents(PlayerLoopEvent.Update, components);
 		private void OnLateUpdate() => InvokeEvents(PlayerLoopEvent.PostLateUpdate, components);
 
-		private void InvokeEvents(PlayerLoopEvent evt, List<RegisteredComponent> list, bool requireActive = true)
+		private void InvokeEvents(PlayerLoopEvent evt, List<RegisteredComponent> list)
 		{
 			for (var index = 0; index < list.Count; index++)
 			{
@@ -129,19 +154,22 @@ namespace Needle.Puerts
 					list.RemoveAt(index--);
 					continue;
 				}
-				if (!reg.Component.isActiveAndEnabled) continue;
-				switch (evt)
+				if (reg.Component is IJSComponent jsComponent)
 				{
-					case PlayerLoopEvent.EarlyUpdate:
-						reg.Component.earlyUpdate?.Invoke();
-						break;
-					case PlayerLoopEvent.Update:
-						reg.Component.update?.Invoke();
-						break;
-					case PlayerLoopEvent.PreLateUpdate:
-					case PlayerLoopEvent.PostLateUpdate:
-						reg.Component.lateUpdate?.Invoke();
-						break;
+					if (!jsComponent.isActiveAndEnabled) continue;
+					switch (evt)
+					{
+						case PlayerLoopEvent.EarlyUpdate:
+							jsComponent.earlyUpdate?.Invoke();
+							break;
+						case PlayerLoopEvent.Update:
+							jsComponent.update?.Invoke();
+							break;
+						case PlayerLoopEvent.PreLateUpdate:
+						case PlayerLoopEvent.PostLateUpdate:
+							jsComponent.lateUpdate?.Invoke();
+							break;
+					}
 				}
 			}
 		}
@@ -149,13 +177,23 @@ namespace Needle.Puerts
 
 	public class RegisteredComponent
 	{
-		public bool Exists => Component;
-		public bool IsValid => Component && JsInstance != null;
+		public bool Exists
+		{
+			get
+			{
+				if (Component is Object obj) return obj;
+				return Component != null;
+			}
+		}
+
+		public bool IsValid => Exists && JsInstance != null;
 		public readonly string Name;
-		public readonly BindableComponent Component;
+		public readonly object Component;
 		public JSObject JsInstance { get; private set; }
 
-		public RegisteredComponent(string name, BindableComponent component)
+		private IList<MemberInfo> functions;
+
+		public RegisteredComponent(string name, object component)
 		{
 			Name = name;
 			Component = component;
@@ -172,9 +210,9 @@ namespace Needle.Puerts
 
 			var inst = Component;
 			var name = Name;
-			var varName = $"{name}_{inst.GetInstanceID()}_{RuntimeHandler.CurrentId++}";
+			var varName = $"{name}_{RuntimeHandler.CurrentId++}";
 
-			var eventBindings = RuntimeHandler.CreateEventBindings(jsInst, csInst);
+			var eventBindings = RuntimeHandler.CreateEventBindings(this.Component, jsInst, csInst, ref functions);
 
 			var chunk = $@"
 const {varName} = require('{name}'); 
@@ -187,17 +225,20 @@ function create({csInst}){{
 create
 ";
 
-			Debug.Log("Create instance for " + name + ":\n" + chunk, inst);
+			Debug.Log("Create instance for " + name + ":\n" + chunk, inst as Object);
 			var create = env.Eval<Func<object, JSObject>>(chunk, varName);
 			this.JsInstance = create(inst);
 
 			if (isRecompile && this.JsInstance != null)
 			{
-				this.Component.awake?.Invoke();
-				if (this.Component.enabled)
+				if (Component is IJSComponent jsComponent)
 				{
-					this.Component.onEnable?.Invoke();
-					this.Component.start?.Invoke();
+					jsComponent.awake?.Invoke();
+					if (jsComponent.enabled)
+					{
+						jsComponent.onEnable?.Invoke();
+						jsComponent.start?.Invoke();
+					}
 				}
 			}
 		}

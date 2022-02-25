@@ -26,6 +26,7 @@ class Behaviour {
 exports.Behaviour = Behaviour;
 class Rotate extends Behaviour {
     self;
+    // color : CS.UnityEngine.Color;
     awake() {
         this.self = this.unity;
     }
@@ -34,12 +35,12 @@ class Rotate extends Behaviour {
             this.trySetColor();
     }
     start() {
-        console.log("START");
-        // https://github.com/chexiongsheng/puerts_unity_demo/blob/master/TsProj/UIEvent.ts
-        const type = (0, puerts_1.$typeof)(csharp_1.default.UnityEngine.Transform);
-        console.log(type);
-        const t = this.unity.GetComponent(type);
-        console.log("TRANSFORM", t);
+        // console.log("START");
+        // // https://github.com/chexiongsheng/puerts_unity_demo/blob/master/TsProj/UIEvent.ts
+        // const type = $typeof(CS.UnityEngine.Transform);
+        // console.log(type);
+        // const t = this.unity.GetComponent(type);
+        // console.log("TRANSFORM", t);
         this.trySetColor();
     }
     update() {

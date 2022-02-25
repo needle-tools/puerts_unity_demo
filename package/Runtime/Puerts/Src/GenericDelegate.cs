@@ -461,7 +461,7 @@ namespace Puerts
             if (resultInfo == IntPtr.Zero)
             {
                 string exceptionInfo = PuertsDLL.GetFunctionLastExceptionInfo(nativeJsFuncPtr);
-                throw new Exception(exceptionInfo);
+                // throw new Exception(exceptionInfo);
             }
 #if THREAD_SAFE
             }

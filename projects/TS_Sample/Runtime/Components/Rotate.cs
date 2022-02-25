@@ -5,15 +5,10 @@ using Needle.Puerts;
 namespace PuertsTest
 {
 	[ExecuteInEditMode]
-	public class Rotate : BindableComponent
+	public class Rotate : JSComponent
 	{
 		public float speed = 20;
 		public bool randomColor = true;
 		public Color color;
-		
-		private void Update()
-		{
-			
-		}
 	}
 }
