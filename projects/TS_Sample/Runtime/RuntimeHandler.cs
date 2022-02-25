@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using DefaultNamespace;
 using Puerts;
 using UnityEngine;
@@ -19,7 +20,11 @@ namespace Needle.Puerts
 			get
 			{
 				EnsureInstance();
-				_env ??= new JsEnv(new NeedleLoader(@"Packages/com.needle.puerts-ts-sample/Runtime/output"));
+				if (_env == null)
+				{
+					_loader.AddFolder(@"Packages/com.needle.puerts-ts-sample/Runtime/output");
+					_env = new JsEnv(_loader);
+				}
 				return _env;
 			}
 		}
@@ -33,12 +38,6 @@ namespace Needle.Puerts
 			}
 		}
 
-		public static void Reload(string name)
-		{
-			Env.ClearModuleCache();
-		}
-
-
 		private static void EnsureInstance()
 		{
 			if (_instance) return;
@@ -47,6 +46,7 @@ namespace Needle.Puerts
 				_instance = new GameObject("Runtime Handler").AddComponent<RuntimeHandler>();
 		}
 
+		private static readonly NeedleLoader _loader = new NeedleLoader();
 		private static JsEnv _env;
 		private static RuntimeHandler _instance;
 
@@ -63,8 +63,10 @@ namespace Needle.Puerts
 			}
 		}
 
-		public static void ReloadComponents(string name)
+		public static void ReloadComponent(string name)
 		{
+			// TODO: we can reload single components
+			ReloadAllComponents();
 		}
 
 		internal static int CurrentId;
@@ -119,17 +121,6 @@ namespace Needle.Puerts
 
 		private void Update()
 		{
-			// var focused = UnityEditorInternal.InternalEditorUtility.isApplicationActive;
-			// if (focused != wasFocused)
-			// {
-			// 	wasFocused = focused;
-			// 	ReloadAllComponents();
-			// }
-#if UNITY_EDITOR
-			if (Time.frameCount % 10 == 0)
-				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-#endif
-
 			Env.Tick();
 		}
 

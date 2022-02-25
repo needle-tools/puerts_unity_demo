@@ -8,7 +8,8 @@ namespace PuertsTest
 	public class Rotate : JSComponent
 	{
 		public float speed = 20;
-		public bool randomColor = true;
+		public bool randomColor = true; 
 		public Color color;
+		public Rotate other;
 	}
 }

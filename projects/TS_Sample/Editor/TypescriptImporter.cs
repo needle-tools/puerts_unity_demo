@@ -1,6 +1,6 @@
 ﻿using UnityEditor.AssetImporters;
 
-namespace Editor
+namespace Needle.Puerts
 {
 	[ScriptedImporter(0, ".ts")]
 	public class TypescriptImporter : ScriptedImporter
@@ -9,7 +9,7 @@ namespace Editor
 		{
 			if (ctx.assetPath.EndsWith(".ts"))
 			{
-				ReloadHandler.CompileTypescript(ctx.assetPath);
+				TypescriptHandler.CompileTypescript(ctx.assetPath);
 			}
 		}
 	}

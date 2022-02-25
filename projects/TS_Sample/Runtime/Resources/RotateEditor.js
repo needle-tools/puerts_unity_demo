@@ -8,7 +8,7 @@ class Editor {
 exports.Editor = Editor;
 class RotateEditor extends Editor {
     onInspectorGUI() {
-        csharp_1.default.UnityEditor.EditorGUILayout.LabelField("JS It Compiles", csharp_1.default.UnityEditor.EditorStyles.boldLabel);
+        csharp_1.default.UnityEditor.EditorGUILayout.LabelField("Inspector from JS", csharp_1.default.UnityEditor.EditorStyles.boldLabel);
         const target = this.unity?.target;
         if (target) {
             const sp = this.unity?.serializedObject?.FindProperty("speed");
@@ -27,6 +27,11 @@ class RotateEditor extends Editor {
                     csharp_1.default.UnityEditor.EditorGUILayout.PropertyField(col);
                     this.unity?.serializedObject?.ApplyModifiedProperties();
                 }
+            }
+            const other = this.unity?.serializedObject?.FindProperty("other");
+            if (other) {
+                csharp_1.default.UnityEditor.EditorGUILayout.PropertyField(other);
+                this.unity?.serializedObject?.ApplyModifiedProperties();
             }
         }
     }
