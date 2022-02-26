@@ -257,7 +257,7 @@ namespace Puerts
             this.generalGetterManager = generalGetterManager;
             this.extensionMethod = extensionMethod;
 
-            if (methodBase.IsConstructor)
+            if (methodBase.IsConstructor || methodBase is ConstructorInfo)
             {
                 constructorInfo = methodBase as ConstructorInfo;
             }
