@@ -53,20 +53,15 @@ namespace Needle.Puerts
 
 		private readonly List<RegisteredComponent> components = new List<RegisteredComponent>();
 
-		public static void ReloadAllComponents()
+		public static void ReloadComponent(string name)
 		{
-			Debug.Log("RELOAD ALL components");
+			Debug.Log("RELOAD components: " + name);
 			Env.ClearModuleCache();
 			foreach (var e in Instance.components)
 			{
-				e.Recreate();
+				if (e.Name == name)
+					e.Recreate();
 			}
-		}
-
-		public static void ReloadComponent(string name)
-		{
-			// TODO: we can reload single components
-			ReloadAllComponents();
 		}
 
 		internal static int CurrentId;
@@ -198,6 +193,15 @@ namespace Needle.Puerts
 		{
 			var env = RuntimeHandler.Env;
 			var isRecompile = JsInstance != null;
+			if (isRecompile)
+			{
+				if (Component is IJSComponent jsComponent)
+				{
+					if (jsComponent.isActiveAndEnabled)
+						jsComponent?.onDisable();
+					jsComponent?.onDestroy();
+				}
+			}
 
 			var inst = Component;
 			var name = Name;
