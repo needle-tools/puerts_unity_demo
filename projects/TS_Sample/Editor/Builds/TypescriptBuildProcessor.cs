@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Needle.Puerts
 {
-	public class TypescriptDirectoryExporter : IPreprocessBuildWithReport, IPostprocessBuildWithReport
+	public class TypescriptBuildProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
 	{
 		public int callbackOrder { get; }
 		private static readonly List<TypescriptDirectory> directories = new List<TypescriptDirectory>();
@@ -27,16 +27,23 @@ namespace Needle.Puerts
 		public void OnPostprocessBuild(BuildReport report)
 		{
 			if (directories.Count > 0)
-				MoveScriptsToStreamingAssets(report.summary.outputPath);
+			{
+				if (MoveScriptsToStreamingAssets(report.summary.outputPath, out var outputDirectories))
+				{
+					CreateTsConfigs(outputDirectories);
+				}
+			}
 			directories.Clear();
 		}
 
-		private static void MoveScriptsToStreamingAssets(string buildPath)
+		private static bool MoveScriptsToStreamingAssets(string buildPath, out List<string> rootOutputDirectories)
 		{
-			if (directories.Count <= 0) return;
+			rootOutputDirectories = null;
+			if (directories.Count <= 0) return false;
 			var directory = Path.GetDirectoryName(buildPath);
 			var dataDirectory = directory + "/" + Path.GetFileNameWithoutExtension(buildPath) + "_Data";
 			var streamingAssetsDirectory = dataDirectory + "/StreamingAssets";
+			var exported = 0;
 			foreach (var scr in directories)
 			{
 				var path = AssetDatabase.GetAssetPath(scr);
@@ -58,6 +65,7 @@ namespace Needle.Puerts
 				}
 				if (!string.IsNullOrWhiteSpace(streamingAssetsRelativePath))
 				{
+					exported += 1;
 					var relDir = "StreamingAssets/" + streamingAssetsRelativePath;
 					scr.scriptsDirectory = relDir.Replace("\\", "/");
 					var typescriptFile = new FileInfo(path);
@@ -74,13 +82,12 @@ namespace Needle.Puerts
 				}
 				else Debug.LogWarning("Did not export " + path);
 			}
-
-			var tsConfigPath = streamingAssetsDirectory + "/tsconfig.json";
-			if(!File.Exists(tsConfigPath))
+			if (exported > 0)
 			{
-				Debug.Log("Create tsconfig: " + tsConfigPath);
-				MenuItems.CreateTsConfig(streamingAssetsDirectory);
+				rootOutputDirectories = new List<string>();
+				rootOutputDirectories.Add(streamingAssetsDirectory);
 			}
+			return exported > 0;
 		}
 
 		private static void CopyDirectory(string sourceDir, string destinationDir, bool recursive, Predicate<FileSystemInfo> filter = null)
@@ -102,6 +109,41 @@ namespace Needle.Puerts
 					var newDestinationDir = Path.Combine(destinationDir, subDir.Name);
 					CopyDirectory(subDir.FullName, newDestinationDir, true, filter);
 				}
+			}
+		}
+
+		private static void CreateTsConfigs(List<string> outputDirectories)
+		{
+			var typesDirectory = new string[]
+			{
+				Application.dataPath + "/Gen/Typing",
+				"Packages/com.tencent.puerts/Runtime/Puerts/Typing"
+			};
+			foreach (var dir in outputDirectories)
+			{
+				var tsConfigPath = dir + "/tsconfig.json";
+				if (!File.Exists(tsConfigPath))
+				{
+					Debug.Log("Create tsconfig: " + tsConfigPath);
+					MenuItems.CreateTsConfig(dir);
+
+					foreach (var td in typesDirectory)
+					{
+						if (!Directory.Exists(td))
+						{
+							Debug.LogWarning("Typings not found at " + td);
+							continue;
+						}
+						var path = Path.GetFullPath(td);
+						CopyDirectory(path, dir + "/Typing", true, Filter);
+					}
+				}
+			}
+
+			bool Filter(FileSystemInfo entry)
+			{
+				if (entry.Extension == ".meta") return true;
+				return false;
 			}
 		}
 	}
