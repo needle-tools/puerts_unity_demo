@@ -8,7 +8,7 @@ class Editor {
 exports.Editor = Editor;
 class RotateEditor extends Editor {
     onInspectorGUI() {
-        csharp_1.default.UnityEditor.EditorGUILayout.LabelField("Inspector from JS", csharp_1.default.UnityEditor.EditorStyles.boldLabel);
+        csharp_1.default.UnityEditor.EditorGUILayout.LabelField("Inspector from JS 123", csharp_1.default.UnityEditor.EditorStyles.boldLabel);
         const target = this.unity?.target;
         if (target) {
             const sp = this.unity?.serializedObject?.FindProperty("speed");

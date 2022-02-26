@@ -44,10 +44,10 @@ namespace Needle.Puerts
 			proc.Start();
 			while (proc != null && !proc.HasExited)
 			{
-				await Task.Delay(100);
+				await Task.Delay(20);
 			}
 			#if UNITY_EDITOR
-			await Task.Delay(50);
+			await Task.Delay(10);
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 			#endif
 			

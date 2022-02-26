@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -8,6 +9,7 @@ using DefaultNamespace;
 using Puerts;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.LowLevel;
 using Object = UnityEngine.Object;
 
 namespace Needle.Puerts
@@ -23,6 +25,7 @@ namespace Needle.Puerts
 				if (_env == null)
 				{
 					_loader.AddFolder(@"Packages/com.needle.puerts-ts-sample/Runtime/output");
+					_loader.AddFolder(Application.streamingAssetsPath);
 					_env = new JsEnv(_loader);
 				}
 				return _env;
@@ -46,9 +49,18 @@ namespace Needle.Puerts
 				_instance = new GameObject("Runtime Handler").AddComponent<RuntimeHandler>();
 		}
 
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+		private static void Init()
+		{
+			var str = Application.streamingAssetsPath;
+			if (!Directory.Exists(str)) Directory.CreateDirectory(str);
+			_watches.Add(new TypescriptWatcher(str));
+		}
+
 		private static readonly NeedleLoader _loader = new NeedleLoader();
 		private static JsEnv _env;
 		private static RuntimeHandler _instance;
+		private static readonly List<TypescriptWatcher> _watches = new List<TypescriptWatcher>();
 
 
 		private readonly List<RegisteredComponent> components = new List<RegisteredComponent>();
@@ -60,12 +72,16 @@ namespace Needle.Puerts
 			foreach (var e in Instance.components)
 			{
 				if (e.Name == name)
+				{
 					e.Recreate();
+				}
 			}
+			if (!Application.isPlaying) Env.Tick();
 		}
 
 		internal static int CurrentId;
 
+#if UNITY_EDITOR
 		public static JSObject RegisterEditor(JSEditor inst)
 		{
 			var name = inst.GetType().Name;
@@ -73,6 +89,7 @@ namespace Needle.Puerts
 			// Instance.components.Add(reg);
 			return reg.JsInstance;
 		}
+#endif
 
 		public static JSObject RegisterComponent(IJSComponent inst)
 		{
@@ -112,7 +129,6 @@ namespace Needle.Puerts
 			return functionBindings;
 		}
 
-		// private bool wasFocused = false;
 
 		private void Update()
 		{
@@ -195,11 +211,11 @@ namespace Needle.Puerts
 			var isRecompile = JsInstance != null;
 			if (isRecompile)
 			{
-				if (Component is IJSComponent jsComponent)
+				if (Component != null && Component is IJSComponent jsComponent)
 				{
 					if (jsComponent.isActiveAndEnabled)
-						jsComponent?.onDisable();
-					jsComponent?.onDestroy();
+						jsComponent.onDisable?.Invoke();
+					jsComponent.onDestroy?.Invoke();
 				}
 			}
 
@@ -224,12 +240,17 @@ create
 			var create = env.Eval<Func<object, JSObject>>(chunk, varName);
 			this.JsInstance = create(inst);
 
-			if (isRecompile && this.JsInstance != null)
+			var raiseEvents = isRecompile;
+#if UNITY_EDITOR
+			var comp = Component as MonoBehaviour;
+			raiseEvents |= !Application.isPlaying && (comp?.runInEditMode ?? false);
+#endif
+			if (raiseEvents && this.JsInstance != null)
 			{
 				if (Component is IJSComponent jsComponent)
 				{
 					jsComponent.awake?.Invoke();
-					if (jsComponent.enabled)
+					if (jsComponent.isActiveAndEnabled)
 					{
 						jsComponent.onEnable?.Invoke();
 						jsComponent.start?.Invoke();

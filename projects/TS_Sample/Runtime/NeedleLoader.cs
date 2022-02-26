@@ -23,9 +23,16 @@ namespace DefaultNamespace
 
 		public bool FileExists(string filepath)
 		{
+			var localFile = filepath.EndsWith(".cjs") || filepath.EndsWith(".mjs") ? Path.ChangeExtension(filepath, ".js") : filepath;
+			Debug.Log("Search file " + localFile);
 			foreach (var dir in directories)
 			{
-				if(File.Exists(Path.Combine(dir, filepath))) return true;
+				Debug.Log("Test? " + dir + ", " + localFile);
+				if (File.Exists(Path.Combine(dir, localFile)))
+				{
+					Debug.Log("FOUND!");
+					return true;
+				}
 			}
 			
 			var pathToUse = PathToUse(filepath);
@@ -39,15 +46,21 @@ namespace DefaultNamespace
 			return exist;
 		}
 
-		public string ReadFile(string filepath, out string debugpath)
+		public string ReadFile(string filepath, out string debugPath)
 		{
+			var localFile = filepath.EndsWith(".cjs") || filepath.EndsWith(".mjs") ? Path.ChangeExtension(filepath, ".js") : filepath;
+			Debug.Log("Try read file " + localFile);
 			foreach (var dir in directories)
 			{
-				var fp = Path.Combine(dir, filepath);
+				var fp = Path.Combine(dir, localFile);
+				Debug.Log("Path?: " + fp);
 				if (File.Exists(fp))
 				{
-					debugpath = Path.Combine(fp, filepath);
-					return File.ReadAllText(debugpath);
+					Debug.Log("Read from " + fp);
+					debugPath = fp;
+					var content = File.ReadAllText(fp);
+					Debug.Log(content);
+					return content;
 				}
 			}
 			
@@ -56,9 +69,9 @@ namespace DefaultNamespace
 
 			if (string.IsNullOrWhiteSpace(debugDirectory) || !Directory.Exists(debugDirectory))
 				debugDirectory = Application.dataPath;
-			debugpath = Path.Combine(debugDirectory, filepath);
+			debugPath = Path.Combine(debugDirectory, filepath);
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-			debugpath = debugpath.Replace("/", "\\");
+			debugPath = debugPath.Replace("/", "\\");
 #endif
 			return file == null ? null : file.text;
 		}

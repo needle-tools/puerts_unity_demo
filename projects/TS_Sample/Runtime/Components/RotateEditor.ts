@@ -15,7 +15,7 @@ export class RotateEditor extends Editor {
 
 
     onInspectorGUI(): void {
-        CS.UnityEditor.EditorGUILayout.LabelField("Inspector from JS", CS.UnityEditor.EditorStyles.boldLabel);
+        CS.UnityEditor.EditorGUILayout.LabelField("Inspector from JS 123", CS.UnityEditor.EditorStyles.boldLabel);
         const target = this.unity?.target as CS.PuertsTest.Rotate;
         if (target) {
             const sp = this.unity?.serializedObject?.FindProperty("speed");

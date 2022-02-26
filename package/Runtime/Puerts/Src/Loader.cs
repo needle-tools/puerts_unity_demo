@@ -12,7 +12,7 @@ namespace Puerts
     public interface ILoader
     {
         bool FileExists(string filepath);
-        string ReadFile(string filepath, out string debugpath);
+        string ReadFile(string filepath, out string debugPath);
     }
 
     public class DefaultLoader : ILoader
@@ -57,21 +57,21 @@ namespace Puerts
 // #endif
         }
 
-        public string ReadFile(string filepath, out string debugpath)
+        public string ReadFile(string filepath, out string debugPath)
         {
 // #if PUERTS_GENERAL
 	        if (isExternal && File.Exists(Path.Combine(root, filepath)))
 	        {
-	            debugpath = Path.Combine(root, filepath);
-	            return File.ReadAllText(debugpath);
+	            debugPath = Path.Combine(root, filepath);
+	            return File.ReadAllText(debugPath);
 	        }
 // #else 
             string pathToUse = this.PathToUse(filepath);
             UnityEngine.TextAsset file = (UnityEngine.TextAsset)UnityEngine.Resources.Load(pathToUse);
             
-            debugpath = System.IO.Path.Combine(root, filepath);
+            debugPath = System.IO.Path.Combine(root, filepath);
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            debugpath = debugpath.Replace("/", "\\");
+            debugPath = debugPath.Replace("/", "\\");
 #endif
             return file == null ? null : file.text;
 // #endif

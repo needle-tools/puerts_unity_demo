@@ -18,14 +18,8 @@ class Rotate extends Behaviour {
             this.trySetColor();
     }
     start() {
-        // console.log("START");
-        // // https://github.com/chexiongsheng/puerts_unity_demo/blob/master/TsProj/UIEvent.ts
-        // const type = $typeof(CS.UnityEngine.Transform);
-        // console.log(type);
-        // const t = this.unity.GetComponent(type);
-        // console.log("TRANSFORM", t);
+        console.log("START");
         this.trySetColor();
-        console.log(this.unity.test);
     }
     update() {
         if (!this.unity)

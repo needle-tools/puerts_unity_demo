@@ -22,6 +22,7 @@ namespace Needle.Puerts
 		Action onValidate { get; set; }
 	}
 
+	[ExecuteInEditMode]
 	public abstract class JSComponent : MonoBehaviour, IJSComponent
 	{
 		private string _moduleName = null;
@@ -67,6 +68,8 @@ namespace Needle.Puerts
 
 		protected virtual void OnEnable()
 		{
+			if (!Application.isPlaying)
+				Register();
 			onEnable?.Invoke();
 		}
 

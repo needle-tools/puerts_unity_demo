@@ -1,4 +1,4 @@
-﻿import CS from 'csharp';
+import CS from 'csharp';
 import { $typeof } from 'puerts'
 
 export class Behaviour {
@@ -30,14 +30,8 @@ export class Rotate extends Behaviour {
     }
 
     start(): void {
-        // console.log("START");
-        // // https://github.com/chexiongsheng/puerts_unity_demo/blob/master/TsProj/UIEvent.ts
-        // const type = $typeof(CS.UnityEngine.Transform);
-        // console.log(type);
-        // const t = this.unity.GetComponent(type);
-        // console.log("TRANSFORM", t);
+        console.log("START");
         this.trySetColor();
-        console.log(this.unity.test);
     }
 
     update() {

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using PuertsTest;
 using UnityEditor;
@@ -9,3 +10,4 @@ namespace Needle.Puerts
 	{
 	}
 }
+#endif

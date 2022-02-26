@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using UnityEditor;
 
@@ -21,8 +22,11 @@ namespace Needle.Puerts
 		{
 			if (onInspectorGUI != null)
 				onInspectorGUI.Invoke();
-			else 
+			else
 				base.OnInspectorGUI();
 		}
 	}
 }
+#else
+public abstract class JSEditor {}
+#endif

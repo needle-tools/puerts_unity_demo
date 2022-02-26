@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using Needle.Puerts;
-using UnityEditor;
 
 namespace PuertsTest
 {
