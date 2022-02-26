@@ -1,0 +1,8 @@
+﻿
+export class $ClassName {
+    start(): void {
+    }
+
+    update() {
+    }
+} 

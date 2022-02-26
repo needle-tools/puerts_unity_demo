@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 using DefaultNamespace;
+using Needle.Puerts.Loaders;
 using Puerts;
-using UnityEngine;
 using UnityEditor;
-using UnityEngine.LowLevel;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Needle.Puerts
@@ -24,11 +22,25 @@ namespace Needle.Puerts
 				EnsureInstance();
 				if (_env == null)
 				{
-					_loader.AddFolder(@"Packages/com.needle.puerts-ts-sample/Runtime/output");
-					_loader.AddFolder(Application.streamingAssetsPath);
+					if (Application.isEditor)
+						_needleLoader.AddFolder(@"Packages/com.needle.puerts-ts-sample/Runtime/output");
+					// _needleLoader.AddFolder(Application.streamingAssetsPath);
+					_loader.AddLoader(_needleLoader);
+					foreach (var loaders in Instance.ScriptLoaders)
+						_loader.AddLoader(loaders);
 					_env = new JsEnv(_loader);
 				}
 				return _env;
+			}
+		}
+
+		public static bool Exists
+		{
+			get
+			{
+				if (_instance) return true;
+				_instance = FindObjectOfType<RuntimeHandler>();
+				return _instance;
 			}
 		}
 
@@ -57,17 +69,24 @@ namespace Needle.Puerts
 			_watches.Add(new TypescriptWatcher(str));
 		}
 
-		private static readonly NeedleLoader _loader = new NeedleLoader();
+		private static readonly NeedleLoader _needleLoader = new NeedleLoader();
+		private static readonly CompoundLoader _loader = new CompoundLoader();
+
 		private static JsEnv _env;
 		private static RuntimeHandler _instance;
 		private static readonly List<TypescriptWatcher> _watches = new List<TypescriptWatcher>();
-
-
 		private readonly List<RegisteredComponent> components = new List<RegisteredComponent>();
+
+		public List<TypescriptDirectory> ScriptLoaders = new List<TypescriptDirectory>();
+
+		// [ContextMenu(nameof(FindAllScriptLoadersInProject))]
+		// private void FindAllScriptLoadersInProject()
+		// {
+		// }
 
 		public static void ReloadComponent(string name)
 		{
-			Debug.Log("RELOAD components: " + name);
+			Debug.Log("RELOAD component: " + name);
 			Env.ClearModuleCache();
 			foreach (var e in Instance.components)
 			{
@@ -84,6 +103,7 @@ namespace Needle.Puerts
 #if UNITY_EDITOR
 		public static JSObject RegisterEditor(JSEditor inst)
 		{
+			Instance.EnsureIsInit();
 			var name = inst.GetType().Name;
 			var reg = new RegisteredComponent(name, inst);
 			// Instance.components.Add(reg);
@@ -93,6 +113,7 @@ namespace Needle.Puerts
 
 		public static JSObject RegisterComponent(IJSComponent inst)
 		{
+			Instance.EnsureIsInit();
 			var name = inst.GetType().Name;
 			var reg = new RegisteredComponent(name, inst);
 			Instance.components.Add(reg);
@@ -130,16 +151,21 @@ namespace Needle.Puerts
 		}
 
 
-		private void Update()
+		private bool isInit = false;
+		private void EnsureIsInit()
 		{
-			Env.Tick();
-		}
-
-		private void Awake()
-		{
+			if (isInit) return;
+			this.isInit = true;
+			foreach (var dir in ScriptLoaders) dir.Init();
 			PlayerLoopHelper.AddUpdateCallback(this, this.OnEarlyUpdate, PlayerLoopEvent.EarlyUpdate);
 			PlayerLoopHelper.AddUpdateCallback(this, this.OnUpdate, PlayerLoopEvent.Update);
 			PlayerLoopHelper.AddUpdateCallback(this, this.OnLateUpdate, PlayerLoopEvent.PostLateUpdate);
+		}
+
+		private void Update()
+		{
+			if (components.Count <= 0) return;
+			Env.Tick();
 		}
 
 		private void OnEarlyUpdate() => InvokeEvents(PlayerLoopEvent.EarlyUpdate, components);
@@ -207,6 +233,11 @@ namespace Needle.Puerts
 
 		public void Recreate()
 		{
+#if UNITY_EDITOR
+			if (BuildPipeline.isBuildingPlayer) return;
+#endif
+			
+			Debug.Log("Recreate " + this.Name);
 			var env = RuntimeHandler.Env;
 			var isRecompile = JsInstance != null;
 			if (isRecompile)

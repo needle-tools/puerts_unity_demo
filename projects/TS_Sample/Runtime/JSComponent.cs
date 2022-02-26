@@ -50,9 +50,16 @@ namespace Needle.Puerts
 		[JSFunction] public Action onDestroy { get; set; }
 		[JSFunction] public Action onValidate { get; set; }
 
-		internal void Register()
+		private void Register()
 		{
-			this.jsInstance = RuntimeHandler.RegisterComponent(this);
+			try
+			{
+				this.jsInstance = RuntimeHandler.RegisterComponent(this);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogException(ex);
+			}
 		}
 
 		protected virtual void OnValidate()

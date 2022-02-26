@@ -35,22 +35,18 @@ namespace Needle.Puerts
 			var pi = new ProcessStartInfo();
 			pi.WorkingDirectory = Path.GetDirectoryName(fullPath)!;
 			pi.FileName = "cmd.exe";
-			pi.Arguments = "/c tsc "; // + Path.GetFileName(fullPath) + " --project " + pi.WorkingDirectory + "  && timeout 10";
+			pi.Arguments = $"/c tsc";// {Path.GetFileName(fullPath)} --target esnext --outfile TESTESTEST.js && timeout 30"; // + Path.GetFileName(fullPath) + " --project " + pi.WorkingDirectory + "  && timeout 10";
 			pi.CreateNoWindow = true;
 			pi.UseShellExecute = false;
 			Debug.Log("Compile: " + Path.GetFileName(fullPath) + ": \"" + pi.Arguments + "\"");
 			var proc = new Process();
 			proc.StartInfo = pi;
 			proc.Start();
-			while (proc != null && !proc.HasExited)
-			{
-				await Task.Delay(20);
-			}
-			#if UNITY_EDITOR
-			await Task.Delay(10);
+			while (!proc.HasExited) await Task.Delay(5);
+#if UNITY_EDITOR
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-			#endif
-			
+#endif
+
 			RuntimeHandler.ReloadComponent(Path.GetFileNameWithoutExtension(path));
 		}
 	}

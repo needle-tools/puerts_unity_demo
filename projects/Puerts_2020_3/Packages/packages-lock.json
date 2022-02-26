@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.needle.console": {
+      "version": "file:../../../../needle-tiny-playground/modules/needle-console/package",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.needle.puerts-ts-sample": {
       "version": "file:../../TS_Sample",
       "depth": 0,

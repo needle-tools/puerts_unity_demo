@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace Needle.Puerts
 	{
 		private FileSystemWatcher watcher;
 		private string dir;
+
+		public event Action<string> FileChanged;
 
 		public TypescriptWatcher(string dir = null)
 		{
@@ -18,6 +21,11 @@ namespace Needle.Puerts
 			if (directory == this.dir && this.watcher != null) return;
 			StopWatch();
 			Debug.Log("Begin Watching " + directory);
+			if (!Directory.Exists(directory))
+			{
+				Debug.LogError("Failed watching: Directory does not exist: " + directory);
+				return;
+			}
 			this.dir = directory;
 			watcher ??= new FileSystemWatcher();
 			watcher.Path = this.dir;
@@ -38,6 +46,7 @@ namespace Needle.Puerts
 		private void OnChange(object sender, FileSystemEventArgs e)
 		{
 			Debug.Log("Script changed: " + e.FullPath);
+			FileChanged?.Invoke(e.FullPath);
 			TypescriptHandler.CompileTypescript(e.FullPath);
 		}
 

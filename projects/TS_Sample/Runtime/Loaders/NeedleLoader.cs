@@ -10,6 +10,7 @@ namespace DefaultNamespace
 		private readonly List<string> directories = new List<string>();
 
 		public string debugDirectory;
+		public bool debug = false;
 
 		public void AddFolder(string dir)
 		{
@@ -24,17 +25,20 @@ namespace DefaultNamespace
 		public bool FileExists(string filepath)
 		{
 			var localFile = filepath.EndsWith(".cjs") || filepath.EndsWith(".mjs") ? Path.ChangeExtension(filepath, ".js") : filepath;
-			Debug.Log("Search file " + localFile);
+			if (debug)
+				Debug.Log("Search file " + localFile);
 			foreach (var dir in directories)
 			{
-				Debug.Log("Test? " + dir + ", " + localFile);
+				if (debug)
+					Debug.Log("Test? " + dir + ", " + localFile);
 				if (File.Exists(Path.Combine(dir, localFile)))
 				{
-					Debug.Log("FOUND!");
+					if (debug)
+						Debug.Log("FOUND!");
 					return true;
 				}
 			}
-			
+
 			var pathToUse = PathToUse(filepath);
 			var exist = Resources.Load(pathToUse) != null;
 #if !PUERTS_GENERAL && UNITY_EDITOR && !UNITY_2018_1_OR_NEWER
@@ -49,21 +53,24 @@ namespace DefaultNamespace
 		public string ReadFile(string filepath, out string debugPath)
 		{
 			var localFile = filepath.EndsWith(".cjs") || filepath.EndsWith(".mjs") ? Path.ChangeExtension(filepath, ".js") : filepath;
-			Debug.Log("Try read file " + localFile);
+			if (debug)
+				Debug.Log("Try read file " + localFile);
 			foreach (var dir in directories)
 			{
 				var fp = Path.Combine(dir, localFile);
-				Debug.Log("Path?: " + fp);
+				if (debug)
+					Debug.Log("Path?: " + fp);
 				if (File.Exists(fp))
 				{
-					Debug.Log("Read from " + fp);
+					if (debug)
+						Debug.Log("Read from " + fp);
 					debugPath = fp;
 					var content = File.ReadAllText(fp);
 					Debug.Log(content);
 					return content;
 				}
 			}
-			
+
 			var pathToUse = PathToUse(filepath);
 			var file = (TextAsset)Resources.Load(pathToUse);
 
@@ -78,11 +85,12 @@ namespace DefaultNamespace
 
 		private static string PathToUse(string filepath)
 		{
-			return 
+			return
 				// .cjs asset is only supported in unity2018+
 #if UNITY_2018_1_OR_NEWER
-				filepath.EndsWith(".cjs") || filepath.EndsWith(".mjs")  ? 
-					filepath.Substring(0, filepath.Length - 4) : 
+				filepath.EndsWith(".cjs") || filepath.EndsWith(".mjs")
+					? filepath.Substring(0, filepath.Length - 4)
+					:
 #endif
 					filepath;
 		}
