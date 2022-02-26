@@ -5,23 +5,6 @@ const csharp_1 = require("csharp");
 const puerts_1 = require("puerts");
 class Behaviour {
     unity;
-    awake() {
-        console.log("AWAKE");
-    }
-    onEnable() {
-        console.log("ENABLED");
-    }
-    onDisable() {
-        console.log("DISABLE");
-    }
-    onValidate() {
-    }
-    start() {
-        console.log("START");
-    }
-    onDestroy() {
-        console.log('onDestroy');
-    }
 }
 exports.Behaviour = Behaviour;
 class Rotate extends Behaviour {

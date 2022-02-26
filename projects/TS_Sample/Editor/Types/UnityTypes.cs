@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Needle.Puerts
 {
 	[Configure]
-	public class ExamplesCfg
+	public class UnityTypes
 	{
 		// This tag is only called for ts. Compared with Binding, this tag only generates ts declarations (that is, no static classes are generated, and only function declarations are generated in index.d.ts for ts to call).
 		[Typing]

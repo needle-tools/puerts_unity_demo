@@ -5,24 +5,15 @@ export class Behaviour {
 
     unity: CS.UnityEngine.MonoBehaviour;
 
-    awake() {
-        console.log("AWAKE");
-    }
-    onEnable() {
-        console.trace("ENABLED"); 
-    }
-    onDisable() {
-        console.log("DISABLE");
-    }
-    onValidate() {
-
-    }
-    start() {
-        console.log("START");
-    }
-    onDestroy() {
-        console.log('onDestroy');  
-    }
+    awake?(): void;
+    onEnable?():void;
+    onDisable?():void;
+    onValidate?():void;
+    start?():void;
+    onDestroy?():void;
+    earlyUpdate?():void;
+    update?():void;
+    lateUpdate?():void;
 }
 
 export class Rotate extends Behaviour {
