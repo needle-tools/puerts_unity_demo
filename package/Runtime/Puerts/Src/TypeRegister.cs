@@ -747,7 +747,7 @@ namespace Puerts
             if (!typeIdMap.TryGetValue(type, out typeId))
             {
                 isFirst = true;
-                typeId = /*typeof(TestStruct) == type ? RegisterTestStruct(isolate, type) : */RegisterType(isolate, type, false);
+                typeId = /*typeof(TestStruct) == type ? RegisterTestStruct(isolate, type) : */RegisterType(isolate, type, true);
                 typeIdMap[type] = typeId;
                 typeMap[typeId] = type;
             }

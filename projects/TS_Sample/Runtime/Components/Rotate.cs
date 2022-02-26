@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Needle.Puerts;
+using UnityEditor;
 
 namespace PuertsTest
 {
@@ -11,5 +12,7 @@ namespace PuertsTest
 		public bool randomColor = true; 
 		public Color color;
 		public Rotate other;
+
+		private string test = "test myfsdfdsfsd";
 	}
 }

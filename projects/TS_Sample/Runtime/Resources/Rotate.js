@@ -25,15 +25,16 @@ class Rotate extends Behaviour {
         // const t = this.unity.GetComponent(type);
         // console.log("TRANSFORM", t);
         this.trySetColor();
+        console.log(this.unity.test);
     }
     update() {
         if (!this.unity)
             return;
-        const speed = this.self.speed;
+        const speed = this.self.speed * 3;
         const r = csharp_1.default.UnityEngine.Vector3.op_Multiply(csharp_1.default.UnityEngine.Vector3.up, csharp_1.default.UnityEngine.Time.deltaTime * speed);
         this.unity.transform.Rotate(r);
         const pos = this.unity.transform.position;
-        pos.y += Math.sin(csharp_1.default.UnityEngine.Time.time) * .001;
+        pos.y += Math.sin(csharp_1.default.UnityEngine.Time.time) * .0001;
         this.unity.transform.position = pos;
         if (csharp_1.default.UnityEngine.Time.frameCount % 60 === 0 && this.self.randomColor)
             this.trySetColor();

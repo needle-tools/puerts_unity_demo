@@ -37,6 +37,7 @@ export class Rotate extends Behaviour {
         // const t = this.unity.GetComponent(type);
         // console.log("TRANSFORM", t);
         this.trySetColor();
+        console.log(this.unity.test);
     }
 
     update() {
