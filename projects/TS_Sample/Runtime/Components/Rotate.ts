@@ -9,7 +9,7 @@ export class Behaviour {
         console.log("AWAKE");
     }
     onEnable() {
-        console.log("ENABLED");
+        console.trace("ENABLED"); 
     }
     onDisable() {
         console.log("DISABLE");
@@ -21,7 +21,7 @@ export class Behaviour {
         console.log("START");
     }
     onDestroy() {
-        console.log('onDestroy');
+        console.log('onDestroy');  
     }
 }
 
@@ -50,12 +50,12 @@ export class Rotate extends Behaviour {
 
     update() {
         if (!this.unity) return;
-        const speed = this.self.speed;
+        const speed = this.self.speed * 3;
         const r = CS.UnityEngine.Vector3.op_Multiply(CS.UnityEngine.Vector3.up, CS.UnityEngine.Time.deltaTime * speed);
         this.unity.transform.Rotate(r);
 
         const pos = this.unity.transform.position;
-        pos.y += Math.sin(CS.UnityEngine.Time.time) * .001;
+        pos.y += Math.sin(CS.UnityEngine.Time.time) * .0001;  
         this.unity.transform.position = pos;
 
         if (CS.UnityEngine.Time.frameCount % 60 === 0 && this.self.randomColor) this.trySetColor();

@@ -45,11 +45,12 @@ if (UnityEngine_Debug) {
 
     console.trace = function() {
         if (console_org) console_org.trace.apply(null, Array.prototype.slice.call(arguments));
-        let stack = new Error().stack;
-        stack = stack.substring(stack.indexOf("\n")+1);
-        stack = stack.replace(/^ {4}/gm, "");
+        let stack = new Error().stack; // get js stack
+        stack = stack.substring(stack.indexOf("\n")+1); // remove first line ("Error")
+        stack = stack.replace(/^ {4}/gm, ""); // remove indentation
+        // TODO: for clickable support we need to get the correct path to the file, currently the stacktrace points to Assets/<file> (?) which is wrong - but this is more like a nice to have
         // stack = stack.replace(/ \(/gm, " (at ");
-        stack = stack.replace(/\\/gm, "/");
+        // stack = stack.replace(/\\/gm, "/");
         // hyperlink but path doesnt exist in Unity (at least when code is in package)
         // stack = stack.replace(/(?<col>:\d+)\)/gm, ")");
         // stack = stack.replace(/\((?<path>.+):(?<line>\d+)\)/gm, "(at <\a href=\"$1\" line=\"$2\">$1:$2</a>)")
