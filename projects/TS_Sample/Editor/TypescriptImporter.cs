@@ -7,7 +7,7 @@ namespace Needle.Puerts
 	{
 		public override void OnImportAsset(AssetImportContext ctx)
 		{
-			if (ctx.assetPath.EndsWith(".ts"))
+			if (ctx.assetPath.EndsWith(".ts") && !ctx.assetPath.EndsWith("index.d.ts"))
 			{
 				TypescriptHandler.CompileTypescript(ctx.assetPath);
 			}
