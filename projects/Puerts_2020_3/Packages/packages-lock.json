@@ -12,6 +12,12 @@
       "source": "local",
       "dependencies": {}
     },
+    "com.needle.typescript-test-package": {
+      "version": "file:../../TS_SomeOtherPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.tencent.puerts": {
       "version": "file:../../../package",
       "depth": 0,

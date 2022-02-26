@@ -1,0 +1,16 @@
+{
+    "name": "com.needle.typescript-test-package",
+    "rootNamespace": "",
+    "references": [
+        "GUID:af6ffc9dc8ffd194db3feea28d2897e6"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
