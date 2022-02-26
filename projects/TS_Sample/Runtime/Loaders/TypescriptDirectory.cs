@@ -12,6 +12,8 @@ namespace Needle.Puerts.Loaders
 	{
 		[SerializeField, HideInInspector] public string scriptsDirectory; // data relative
 
+		public bool debug = false;
+
 		private TypescriptWatcher watcher;
 
 		public void Init()
@@ -39,21 +41,22 @@ namespace Needle.Puerts.Loaders
 
 		private void InitEditor()
 		{
-			var assetPath = Path.GetFullPath(AssetDatabase.GetAssetPath(this)); 
+			var assetPath = Path.GetFullPath(AssetDatabase.GetAssetPath(this));
 			var currentDirectory = Path.GetDirectoryName(assetPath);
 			InitAt(currentDirectory);
 		}
 #endif
 		private void InitAt(string directory)
 		{
-			if (Directory.Exists(directory))
+			if (Directory.Exists(directory)) 
 			{
-				Debug.Log("Watching " + directory);
+				if (debug)
+					Debug.Log("Watching " + directory);
 				this.watcher = new TypescriptWatcher(directory);
 				files.Clear();
 				this.RecursiveAddFiles(new DirectoryInfo(directory));
 			}
-			else Debug.LogWarning("Directory does not exisT: " + directory);
+			else Debug.LogWarning("Directory does not exist: " + directory);
 		}
 
 		private readonly Dictionary<string, string> files = new Dictionary<string, string>();
@@ -61,28 +64,34 @@ namespace Needle.Puerts.Loaders
 		private void RecursiveAddFiles(DirectoryInfo currentDir)
 		{
 			var allFiles = currentDir.GetFiles("*.ts", SearchOption.AllDirectories);
-			Debug.Log("Register " + allFiles.Length + " files");
+			if (debug)
+				Debug.Log("Register " + allFiles.Length + " files");
 			foreach (var file in allFiles)
 			{
 				var key = Path.ChangeExtension(file.Name, ".js");
 				var path = Path.ChangeExtension(file.FullName, ".js");
-				Debug.Log("Register " + key + ": " + path);
+				if (debug)
+					Debug.Log("Register " + key + ": " + path);
 				files.Add(key, path);
 			}
-			Debug.Log("Did register " + files.Count + " files");
+			if (debug)
+				Debug.Log("Did register " + files.Count + " files");
 		}
 
 		public bool FileExists(string filepath)
 		{
-			Debug.Log("Has: " + filepath + ", known files: " + files.Count);
+			if (debug)
+				Debug.Log("Has: " + filepath + ", known files: " + files.Count);
 			var res = files.TryGetValue(filepath, out var path) && File.Exists(path);
-			Debug.Log(res);
+			if (debug)
+				Debug.Log(res);
 			return res;
 		}
 
 		public string ReadFile(string filepath, out string debugPath)
 		{
-			Debug.Log("Read: " + filepath);
+			if (debug)
+				Debug.Log("Read: " + filepath);
 			if (files.TryGetValue(filepath, out var fp))
 			{
 				if (File.Exists(fp))

@@ -247,6 +247,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5a51489d672486db4aa1cbf596be68f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AutoCollectScriptLoaders: 1
   ScriptLoaders:
   - {fileID: 11400000, guid: 8d89eb2383abe8c449aa43f07acaccf5, type: 2}
   - {fileID: 11400000, guid: 0e203f237f7609e4392c484087409183, type: 2}

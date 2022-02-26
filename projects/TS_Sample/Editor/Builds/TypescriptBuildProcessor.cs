@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Needle.Puerts.Loaders;
 using PlasticGui.WorkspaceWindow.Items;
 using UnityEditor;
@@ -75,9 +76,7 @@ namespace Needle.Puerts
 						entry =>
 						{
 							if (entry.FullName == typescriptFile.FullName) return true;
-							if (entry.Name.EndsWith(".meta")) return true;
-							if (entry.Name.EndsWith(".cs")) return true;
-							return false;
+							return DefaultFilter(entry);
 						});
 				}
 				else Debug.LogWarning("Did not export " + path);
@@ -114,6 +113,7 @@ namespace Needle.Puerts
 
 		private static void CreateTsConfigs(List<string> outputDirectories)
 		{
+			// TODO: automatically find typings
 			var typesDirectory = new string[]
 			{
 				Application.dataPath + "/Gen/Typing",
@@ -135,16 +135,24 @@ namespace Needle.Puerts
 							continue;
 						}
 						var path = Path.GetFullPath(td);
-						CopyDirectory(path, dir + "/Typing", true, Filter);
+						CopyDirectory(path, dir + "/Typing", true, DefaultFilter);
 					}
 				}
 			}
+		}
 
-			bool Filter(FileSystemInfo entry)
-			{
-				if (entry.Extension == ".meta") return true;
-				return false;
-			}
+
+		private static readonly string[] defaultAllowedExtensions =
+		{
+			".js",
+			".ts",
+			".js.map",
+		};
+		
+		private static bool DefaultFilter(FileSystemInfo entry)
+		{
+			if (defaultAllowedExtensions.Any(e => entry.Name.EndsWith(e))) return false;
+			return true;
 		}
 	}
 }

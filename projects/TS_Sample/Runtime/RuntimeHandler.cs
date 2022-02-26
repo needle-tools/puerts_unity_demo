@@ -77,12 +77,22 @@ namespace Needle.Puerts
 		private static readonly List<TypescriptWatcher> _watches = new List<TypescriptWatcher>();
 		private readonly List<RegisteredComponent> components = new List<RegisteredComponent>();
 
+		public bool DebugLogs;
+		public bool AutoCollectScriptLoaders = false;
 		public List<TypescriptDirectory> ScriptLoaders = new List<TypescriptDirectory>();
 
-		// [ContextMenu(nameof(FindAllScriptLoadersInProject))]
-		// private void FindAllScriptLoadersInProject()
-		// {
-		// }
+#if UNITY_EDITOR
+		[ContextMenu(nameof(FindAllScriptLoadersInEditorProject))]
+		internal void FindAllScriptLoadersInEditorProject()
+		{
+			ScriptLoaders.Clear();
+			var loaders = AssetDatabase.FindAssets("t:" + nameof(TypescriptDirectory)).Select(AssetDatabase.GUIDToAssetPath);
+			foreach (var path in loaders)
+			{
+				ScriptLoaders.Add(AssetDatabase.LoadAssetAtPath<TypescriptDirectory>(path));
+			}
+		}
+#endif
 
 		public static void ReloadComponent(string name)
 		{
@@ -148,18 +158,46 @@ namespace Needle.Puerts
 			return functionBindings;
 		}
 
-
-		private bool isInit = false;
+		private bool didInitScriptLoaders = false;
+		private bool isSubscribedToPlayerLoop = false;
 
 		private void EnsureIsInit()
 		{
-			if (isInit) return;
-			this.isInit = true;
-			foreach (var dir in ScriptLoaders) dir.Init();
-			PlayerLoopHelper.AddUpdateCallback(this, this.OnEarlyUpdate, PlayerLoopEvent.EarlyUpdate);
-			PlayerLoopHelper.AddUpdateCallback(this, this.OnUpdate, PlayerLoopEvent.Update);
-			PlayerLoopHelper.AddUpdateCallback(this, this.OnLateUpdate, PlayerLoopEvent.PostLateUpdate);
+			if (!didInitScriptLoaders)
+			{
+				this.didInitScriptLoaders = true;
+				foreach (var dir in ScriptLoaders)
+				{
+					if (!dir) continue;
+					if (DebugLogs)
+						Debug.Log("Init " + dir.name, dir);
+					dir.Init();
+				}
+			}
+
+			if (!isSubscribedToPlayerLoop)
+			{
+				isSubscribedToPlayerLoop = true;
+				PlayerLoopHelper.AddUpdateCallback(this, this.OnEarlyUpdate, PlayerLoopEvent.EarlyUpdate);
+				PlayerLoopHelper.AddUpdateCallback(this, this.OnUpdate, PlayerLoopEvent.Update);
+				PlayerLoopHelper.AddUpdateCallback(this, this.OnLateUpdate, PlayerLoopEvent.PostLateUpdate);
+			}
 		}
+
+#if UNITY_EDITOR
+		[InitializeOnLoadMethod]
+		private static void OnEditorRecompiled()
+		{
+			if (Exists) Instance.didInitScriptLoaders = false;
+		}
+
+		private void OnValidate()
+		{
+			if (AutoCollectScriptLoaders) FindAllScriptLoadersInEditorProject();
+			didInitScriptLoaders = false;
+			EnsureIsInit();
+		}
+#endif
 
 		private void Update()
 		{
@@ -181,7 +219,8 @@ namespace Needle.Puerts
 			Env.ClearModuleCache();
 			foreach (var def in deferredReload)
 			{
-				Debug.Log("RELOAD component: " + def);
+				if (DebugLogs)
+					Debug.Log("RELOAD component: " + def);
 				foreach (var comp in components)
 				{
 					if (comp.Name == def)
@@ -292,7 +331,9 @@ function create({csInst}){{
 create
 ";
 
-			Debug.Log("Create instance for " + name + ":\n" + chunk, inst as Object);
+
+			if (RuntimeHandler.Instance.DebugLogs)
+				Debug.Log("Create instance for " + name + ":\n" + chunk, inst as Object);
 			var create = env.Eval<Func<object, JSObject>>(chunk, varName);
 			this.JsInstance = create(inst);
 
