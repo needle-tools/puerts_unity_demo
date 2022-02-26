@@ -39,23 +39,28 @@ namespace Needle.Puerts
 			var sel = Selection.assetGUIDs.FirstOrDefault();
 			if (!string.IsNullOrWhiteSpace(sel))
 			{
-				var templateGuid = "1e1d43992ed743b8a195982130bea04c";
-				var templatePath = AssetDatabase.GUIDToAssetPath(templateGuid);
-				if (string.IsNullOrWhiteSpace(templatePath) || !File.Exists(templatePath))
-				{
-					Debug.LogError("Could not find template: " + templateGuid + "; " + templatePath);
-					return;
-				}
-				var templateContent = File.ReadAllText(templatePath);
-				var fileName = "tsconfig";
 				var path = AssetDatabase.GUIDToAssetPath(sel);
-				if (File.Exists(path)) path = Path.GetDirectoryName(path);
-				if (string.IsNullOrWhiteSpace(path)) return;
-				File.WriteAllText($"{path}/{fileName}.json", templateContent);
-				AssetDatabase.ImportAsset(path);
-				AssetDatabase.Refresh();
-				Selection.activeObject = AssetDatabase.LoadAssetAtPath<Object>(path);
+				CreateTsConfig(path);
 			}
+		}
+
+		public static void CreateTsConfig(string path)
+		{
+			var templateGuid = "1e1d43992ed743b8a195982130bea04c";
+			var templatePath = AssetDatabase.GUIDToAssetPath(templateGuid);
+			if (string.IsNullOrWhiteSpace(templatePath) || !File.Exists(templatePath))
+			{
+				Debug.LogError("Could not find template: " + templateGuid + "; " + templatePath);
+				return;
+			}
+			var templateContent = File.ReadAllText(templatePath);
+			var fileName = "tsconfig";
+			if (File.Exists(path)) path = Path.GetDirectoryName(path);
+			if (string.IsNullOrWhiteSpace(path)) return;
+			File.WriteAllText($"{path}/{fileName}.json", templateContent);
+			AssetDatabase.ImportAsset(path);
+			AssetDatabase.Refresh();
+			Selection.activeObject = AssetDatabase.LoadAssetAtPath<Object>(path);
 		}
 	}
 }

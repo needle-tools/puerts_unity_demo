@@ -1,1 +1,1 @@
-{"version":3,"file":"NewTypescriptComponent.js","sourceRoot":"","sources":["NewTypescriptComponent.ts"],"names":[],"mappings":";;;AACA,MAAa,sBAAsB;IAE/B,KAAK;QACD,OAAO,CAAC,GAAG,CAAC,aAAa,CAAC,CAAC;IAC/B,CAAC;IAED,MAAM;IACN,CAAC;CACJ;AARD,wDAQC"}
+{"version":3,"file":"NewTypescriptComponent.js","sourceRoot":"","sources":["NewTypescriptComponent.ts"],"names":[],"mappings":";;;AACA,MAAa,sBAAsB;IAE/B,KAAK;QACD,OAAO,CAAC,GAAG,CAAC,iBAAiB,CAAC,CAAC;IACnC,CAAC;IAED,MAAM;IACN,CAAC;CACJ;AARD,wDAQC"}

@@ -39,7 +39,8 @@ namespace Needle.Puerts.Loaders
 
 		private void InitEditor()
 		{
-			var currentDirectory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(this));
+			var assetPath = Path.GetFullPath(AssetDatabase.GetAssetPath(this)); 
+			var currentDirectory = Path.GetDirectoryName(assetPath);
 			InitAt(currentDirectory);
 		}
 #endif

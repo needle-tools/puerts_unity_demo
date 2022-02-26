@@ -86,16 +86,14 @@ namespace Needle.Puerts
 
 		public static void ReloadComponent(string name)
 		{
-			Debug.Log("RELOAD component: " + name);
-			Env.ClearModuleCache();
-			foreach (var e in Instance.components)
+			if (Instance.components.Count <= 0) return;
+			if (!Instance.deferredReload.Contains(name))
+				Instance.deferredReload.Add(name);
+			if (!Application.isPlaying)
 			{
-				if (e.Name == name)
-				{
-					e.Recreate();
-				}
+				Instance.ProcessDeferredReloadNow();
+				Env.Tick();
 			}
-			if (!Application.isPlaying) Env.Tick();
 		}
 
 		internal static int CurrentId;
@@ -152,6 +150,7 @@ namespace Needle.Puerts
 
 
 		private bool isInit = false;
+
 		private void EnsureIsInit()
 		{
 			if (isInit) return;
@@ -165,7 +164,33 @@ namespace Needle.Puerts
 		private void Update()
 		{
 			if (components.Count <= 0) return;
+			ProcessDeferredReloadNow();
 			Env.Tick();
+		}
+
+		private readonly List<string> deferredReload = new List<string>();
+
+		private void ProcessDeferredReloadNow()
+		{
+			if (deferredReload.Count <= 0) return;
+			if (components.Count <= 0)
+			{
+				deferredReload.Clear();
+				return;
+			}
+			Env.ClearModuleCache();
+			foreach (var def in deferredReload)
+			{
+				Debug.Log("RELOAD component: " + def);
+				foreach (var comp in components)
+				{
+					if (comp.Name == def)
+					{
+						comp.Recreate();
+					}
+				}
+			}
+			deferredReload.Clear();
 		}
 
 		private void OnEarlyUpdate() => InvokeEvents(PlayerLoopEvent.EarlyUpdate, components);
@@ -236,7 +261,7 @@ namespace Needle.Puerts
 #if UNITY_EDITOR
 			if (BuildPipeline.isBuildingPlayer) return;
 #endif
-			
+
 			Debug.Log("Recreate " + this.Name);
 			var env = RuntimeHandler.Env;
 			var isRecompile = JsInstance != null;

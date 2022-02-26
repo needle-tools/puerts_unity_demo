@@ -33,8 +33,10 @@ namespace Needle.Puerts
 
 		private static void MoveScriptsToStreamingAssets(string buildPath)
 		{
+			if (directories.Count <= 0) return;
 			var directory = Path.GetDirectoryName(buildPath);
 			var dataDirectory = directory + "/" + Path.GetFileNameWithoutExtension(buildPath) + "_Data";
+			var streamingAssetsDirectory = dataDirectory + "/StreamingAssets";
 			foreach (var scr in directories)
 			{
 				var path = AssetDatabase.GetAssetPath(scr);
@@ -49,15 +51,19 @@ namespace Needle.Puerts
 				}
 				else if (path.StartsWith("Packages/"))
 				{
+					var packageName = path.Substring("Packages/".Length);
+					var nameEnd = packageName.IndexOf("/", StringComparison.Ordinal);
+					packageName = packageName.Substring(0, nameEnd);
+					streamingAssetsRelativePath = packageName + "/" + new DirectoryInfo(dir).Name;
 				}
 				if (!string.IsNullOrWhiteSpace(streamingAssetsRelativePath))
 				{
 					var relDir = "StreamingAssets/" + streamingAssetsRelativePath;
 					scr.scriptsDirectory = relDir.Replace("\\", "/");
 					var typescriptFile = new FileInfo(path);
-					var streamingAssetsDirectory = dataDirectory + "/StreamingAssets/" + streamingAssetsRelativePath;
-					Directory.CreateDirectory(streamingAssetsDirectory);
-					CopyDirectory(Path.GetFullPath(dir), streamingAssetsDirectory, true,
+					var pathInStreamingAssets = dataDirectory + "/StreamingAssets/" + streamingAssetsRelativePath;
+					Directory.CreateDirectory(pathInStreamingAssets);
+					CopyDirectory(Path.GetFullPath(dir), pathInStreamingAssets, true,
 						entry =>
 						{
 							if (entry.FullName == typescriptFile.FullName) return true;
@@ -66,6 +72,14 @@ namespace Needle.Puerts
 							return false;
 						});
 				}
+				else Debug.LogWarning("Did not export " + path);
+			}
+
+			var tsConfigPath = streamingAssetsDirectory + "/tsconfig.json";
+			if(!File.Exists(tsConfigPath))
+			{
+				Debug.Log("Create tsconfig: " + tsConfigPath);
+				MenuItems.CreateTsConfig(streamingAssetsDirectory);
 			}
 		}
 
