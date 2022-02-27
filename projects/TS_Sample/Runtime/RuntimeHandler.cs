@@ -61,14 +61,6 @@ namespace Needle.Puerts
 				_instance = new GameObject("Runtime Handler").AddComponent<RuntimeHandler>();
 		}
 
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-		private static void Init()
-		{
-			var str = Application.streamingAssetsPath;
-			if (!Directory.Exists(str)) Directory.CreateDirectory(str);
-			_watches.Add(new TypescriptWatcher(str));
-		}
-
 		private static readonly NeedleLoader _needleLoader = new NeedleLoader();
 		private static readonly CompoundLoader _loader = new CompoundLoader();
 
@@ -230,14 +222,21 @@ namespace Needle.Puerts
 			Env.ClearModuleCache();
 			foreach (var def in deferredReload)
 			{
-				if (DebugLogs)
-					Debug.Log("RELOAD component: " + def);
-				foreach (var comp in components)
+				try
 				{
-					if (comp.Name == def)
+					if (DebugLogs)
+						Debug.Log("RELOAD component: " + def);
+					foreach (var comp in components)
 					{
-						comp.Recreate();
+						if (comp.Name == def)
+						{
+							comp.Recreate();
+						}
 					}
+				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
 				}
 			}
 			deferredReload.Clear();

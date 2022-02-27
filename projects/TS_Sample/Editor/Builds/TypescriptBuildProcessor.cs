@@ -135,7 +135,9 @@ namespace Needle.Puerts
 							continue;
 						}
 						var path = Path.GetFullPath(td);
-						CopyDirectory(path, dir + "/Typing", true, DefaultFilter);
+						var outputDir = dir + "/Typing";
+						Debug.Log("Copy typings from " + path + " to " + outputDir);
+						CopyDirectory(path, outputDir, true, DefaultFilter);
 					}
 				}
 			}
@@ -147,10 +149,12 @@ namespace Needle.Puerts
 			".js",
 			".ts",
 			".js.map",
+			".d",
 		};
 		
 		private static bool DefaultFilter(FileSystemInfo entry)
 		{
+			if (entry is DirectoryInfo) return false;
 			if (defaultAllowedExtensions.Any(e => entry.Name.EndsWith(e))) return false;
 			return true;
 		}
