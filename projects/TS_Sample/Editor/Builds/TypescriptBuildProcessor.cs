@@ -125,7 +125,7 @@ namespace Needle.Puerts
 				if (!File.Exists(tsConfigPath))
 				{
 					Debug.Log("Create tsconfig: " + tsConfigPath);
-					MenuItems.CreateTsConfig(dir);
+					MenuItems.CreateTsConfig(dir, "");
 
 					foreach (var td in typesDirectory)
 					{

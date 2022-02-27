@@ -1,9 +1,10 @@
 
 export class MyComponent {
     start(): void {
-        console.log("Hello from my component");  
+        console.log("Hello from my component");      
     }
 
-    update() {
+    update() {   
     }
 } 
+ 

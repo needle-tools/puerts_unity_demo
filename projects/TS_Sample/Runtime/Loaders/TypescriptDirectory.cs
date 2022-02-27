@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Needle.Puerts.Loaders
 {
-	[CreateAssetMenu(menuName = "Typescript/Config1")]
+	[CreateAssetMenu(menuName = "Typescript/Export Directory")]
 	public class TypescriptDirectory : ScriptableObject, ILoader
 	{
 		[SerializeField, HideInInspector] public string scriptsDirectory; // data relative
@@ -41,7 +41,13 @@ namespace Needle.Puerts.Loaders
 
 		private void InitEditor()
 		{
-			var assetPath = Path.GetFullPath(AssetDatabase.GetAssetPath(this));
+			var path = AssetDatabase.GetAssetPath(this);
+			if (string.IsNullOrWhiteSpace(path))
+			{
+				Debug.LogError("Failed to find path for " + this, this);
+				return;
+			}
+			var assetPath = Path.GetFullPath(path);
 			var currentDirectory = Path.GetDirectoryName(assetPath);
 			InitAt(currentDirectory);
 		}

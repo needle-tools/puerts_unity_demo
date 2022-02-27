@@ -8,6 +8,7 @@ namespace Needle.Puerts
 	{
 		private FileSystemWatcher watcher;
 		private string dir;
+		public bool debugLog = false;
 
 		public event Action<string> FileChanged;
 
@@ -20,7 +21,8 @@ namespace Needle.Puerts
 		{
 			if (directory == this.dir && this.watcher != null) return;
 			StopWatch();
-			Debug.Log("Begin Watching " + directory);
+			if (debugLog)
+				Debug.Log("Begin Watching " + directory);
 			if (!Directory.Exists(directory))
 			{
 				Debug.LogError("Failed watching: Directory does not exist: " + directory);
@@ -40,14 +42,16 @@ namespace Needle.Puerts
 
 		private void OnDeleted(object sender, FileSystemEventArgs e)
 		{
-			Debug.Log("Script deleted: " + e.FullPath);
+			if (debugLog)
+				Debug.Log("Script deleted: " + e.FullPath);
 		}
 
 		private void OnChange(object sender, FileSystemEventArgs e)
 		{
-			Debug.Log("Script changed: " + e.FullPath);
+			if (debugLog)
+				Debug.Log("Script changed: " + e.FullPath);
 			FileChanged?.Invoke(e.FullPath);
-			TypescriptHandler.CompileTypescript(e.FullPath);
+			TypescriptHandler.CompileTypescript(e.FullPath, debugLog);
 		}
 
 		public void StopWatch()

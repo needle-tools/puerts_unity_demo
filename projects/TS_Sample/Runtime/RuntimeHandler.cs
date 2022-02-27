@@ -121,6 +121,8 @@ namespace Needle.Puerts
 
 		public static JSObject RegisterComponent(IJSComponent inst)
 		{
+			var existing = Instance.components.FirstOrDefault(c => c.Component == inst);
+			if (existing != null) return existing.JsInstance;
 			Instance.EnsureIsInit();
 			var name = inst.GetType().Name;
 			var reg = new RegisteredComponent(name, inst);
@@ -189,6 +191,15 @@ namespace Needle.Puerts
 		private static void OnEditorRecompiled()
 		{
 			if (Exists) Instance.didInitScriptLoaders = false;
+			EditorApplication.playModeStateChanged += OnPlayModeChange;
+			EditorApplication.update += () => framesSincePlaymodeChanged += 1;
+		}
+
+		internal static int framesSincePlaymodeChanged;
+
+		private static void OnPlayModeChange(PlayModeStateChange obj)
+		{
+			framesSincePlaymodeChanged = 0;
 		}
 
 		private void OnValidate()
@@ -301,7 +312,10 @@ namespace Needle.Puerts
 			if (BuildPipeline.isBuildingPlayer) return;
 #endif
 
-			Debug.Log("Recreate " + this.Name);
+			var debugLogs = RuntimeHandler.Instance.DebugLogs;
+
+			if (debugLogs)
+				Debug.Log("Recreate " + this.Name);
 			var env = RuntimeHandler.Env;
 			var isRecompile = JsInstance != null;
 			if (isRecompile)
@@ -332,7 +346,7 @@ create
 ";
 
 
-			if (RuntimeHandler.Instance.DebugLogs)
+			if (debugLogs)
 				Debug.Log("Create instance for " + name + ":\n" + chunk, inst as Object);
 			var create = env.Eval<Func<object, JSObject>>(chunk, varName);
 			this.JsInstance = create(inst);
@@ -340,7 +354,10 @@ create
 			var raiseEvents = isRecompile;
 #if UNITY_EDITOR
 			var comp = Component as MonoBehaviour;
-			raiseEvents |= !Application.isPlaying && (comp?.runInEditMode ?? false);
+			var b = !Application.isPlaying && !EditorApplication.isPlayingOrWillChangePlaymode && (comp?.runInEditMode ?? false);
+			var td = RuntimeHandler.framesSincePlaymodeChanged;
+			b &= td > 10;
+			raiseEvents |= b;
 #endif
 			if (raiseEvents && this.JsInstance != null)
 			{

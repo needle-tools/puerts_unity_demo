@@ -9,7 +9,7 @@ namespace Needle.Puerts
 		{
 			if (ctx.assetPath.EndsWith(".ts") && !ctx.assetPath.EndsWith("index.d.ts"))
 			{
-				TypescriptHandler.CompileTypescript(ctx.assetPath);
+				TypescriptHandler.CompileTypescript(ctx.assetPath, false);
 			}
 		}
 	}

@@ -6,10 +6,7 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "typeRoots": [
-      "../../../package/Runtime/Puerts/Typing",
-      "../../../package/Runtime/Gen/Typing",
-      "../../Puerts_2020_3/Assets/Gen/Typing",
-      "node_modules/@types"
+      "./Typing"
     ],
     "outDir": "Resources"
   }
